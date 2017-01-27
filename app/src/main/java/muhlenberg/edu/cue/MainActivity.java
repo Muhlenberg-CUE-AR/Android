@@ -1,10 +1,11 @@
 package muhlenberg.edu.cue;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.beyondar.android.fragment.BeyondarFragmentSupport;
-import com.beyondar.android.world.World;
+
+import muhlenberg.edu.cue.services.LocationService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,6 +19,13 @@ public class MainActivity extends AppCompatActivity {
     private BeyondarFragmentSupport arFragment;
 
     /**
+     * A LocationService reference to the singleton service that will manage the users current
+     * location. This is expected to live and die with the app and will not run in the background.
+     * Navigation and GPS signalling is expected to occur while the app is open and not outside it.
+     */
+    private LocationService locationService;
+
+    /**
      * Entrypoint of the app. onCreate() should instantiate arFragment, any required services (GPS,
      * WiFi, etc), and load any necessary assets, like images or sound.
      * @param savedInstanceState
@@ -28,5 +36,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         arFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(R.id.arFragment);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        initServices();
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+
+
+    private void initServices() {
+        locationService = LocationService.getInstance(MainActivity.this);
+        locationService.start();
     }
 }
