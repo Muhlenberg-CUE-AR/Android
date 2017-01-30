@@ -59,7 +59,7 @@ import android.opengl.GLSurfaceView;
  *
  */
 public class ARRenderer implements GLSurfaceView.Renderer {
-	
+
     /**
      * Allows subclasses to load markers and prepare the scene. This is called after 
      * initialisation is complete.

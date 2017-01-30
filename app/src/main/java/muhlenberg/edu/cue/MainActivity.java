@@ -2,58 +2,61 @@ package muhlenberg.edu.cue;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.view.View;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationListener;
 
 import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import muhlenberg.edu.cue.services.CUELocationService;
+import muhlenberg.edu.cue.util.text.CUERenderer;
+
 /**
  * Created by Jalal on 1/28/2017.
  */
-public class MainActivity extends ARActivity {
+public class MainActivity extends ARActivity implements LocationListener {
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 133;
     /**
-     * A custom renderer is used to produce a new visual experience.
+     * A custom renderer to manage custom object rendering
      */
-    private SimpleRenderer simpleRenderer = new SimpleRenderer();
+    private CUERenderer cueRenderer = new CUERenderer(this);
 
-    /**
-     * The FrameLayout where the AR view is displayed.
-     */
-    private FrameLayout mainLayout;
+    private CUELocationService locationService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mainLayout = (FrameLayout)this.findViewById(R.id.mainLayout);
-
         if (!checkCameraPermission()) {
-            //if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) { //ASK EVERY TIME - it's essential!
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
 
-        // When the screen is tapped, inform the renderer and vibrate the phone
-        mainLayout.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        this.locationService = CUELocationService.getInstance(this);
+    }
 
-                simpleRenderer.click();
+    @Override
+    public void onResume() {
+        super.onResume();
 
-                Vibrator vib = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                vib.vibrate(40);
-            }
+        this.locationService.start();
 
-        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        this.locationService.stop();
     }
 
     /**
@@ -66,7 +69,7 @@ public class MainActivity extends ARActivity {
             return null;
         }
 
-        return new SimpleRenderer();
+        return cueRenderer;
     }
 
     /**
@@ -92,5 +95,12 @@ public class MainActivity extends ARActivity {
                 return;
             }
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d("cuear", "received new location");
+        if(location != null)
+            cueRenderer.setText(location.toString());
     }
 }

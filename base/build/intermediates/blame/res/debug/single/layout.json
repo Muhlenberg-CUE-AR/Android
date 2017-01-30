@@ -4,12 +4,12 @@
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.1\\res\\layout\\abc_action_bar_view_list_nav_layout.xml"
     },
     {
-        "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\debug\\layout\\select_dialog_singlechoice_material.xml",
-        "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.1\\res\\layout\\select_dialog_singlechoice_material.xml"
-    },
-    {
         "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\debug\\layout\\notification_template_part_time.xml",
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.1\\res\\layout\\notification_template_part_time.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\debug\\layout\\select_dialog_singlechoice_material.xml",
+        "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.1\\res\\layout\\select_dialog_singlechoice_material.xml"
     },
     {
         "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\debug\\layout\\abc_action_mode_bar.xml",

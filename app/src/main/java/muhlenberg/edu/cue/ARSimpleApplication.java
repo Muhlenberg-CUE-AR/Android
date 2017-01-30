@@ -27,7 +27,7 @@ public class ARSimpleApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        context = this.getContext();
+        context = ARSimpleApplication.getContext();
         ((ARSimpleApplication) instance).initializeInstance();
     }
 
