@@ -112,9 +112,13 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
             cueRenderer.setText(location.toString());
     }
 
+    // when any sensor gets a new value this function is run
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.d("Jalal","Jalal is lame");
+        float azimuthRadians = event.values[0];
+        Float azimuthDegrees = (azimuthRadians * 180) / (float) Math.PI;
+        Log.d("Azimuth", azimuthDegrees.toString());
     }
 
     @Override
