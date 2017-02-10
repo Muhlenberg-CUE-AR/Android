@@ -2,5 +2,9 @@
     {
         "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\release\\xml\\preferences.xml",
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\src\\main\\res\\xml\\preferences.xml"
+    },
+    {
+        "merged": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\build\\intermediates\\res\\merged\\release\\xml\\preferences.xml",
+        "source": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\src\\main\\res\\xml\\preferences.xml"
     }
 ]

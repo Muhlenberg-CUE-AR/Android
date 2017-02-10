@@ -92,6 +92,10 @@
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.1\\res\\drawable-xhdpi\\abc_popup_background_mtrl_mult.9.png"
     },
     {
+        "merged": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\settings.png",
+        "source": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\settings.png"
+    },
+    {
         "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\abc_menu_hardkey_panel_mtrl_mult.9.png",
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.1\\res\\drawable-xhdpi\\abc_menu_hardkey_panel_mtrl_mult.9.png"
     },

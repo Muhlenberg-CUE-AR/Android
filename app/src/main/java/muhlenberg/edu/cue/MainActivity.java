@@ -2,6 +2,9 @@ package muhlenberg.edu.cue;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -16,12 +19,13 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
 import muhlenberg.edu.cue.services.CUELocationService;
+import muhlenberg.edu.cue.services.CUESensorService;
 import muhlenberg.edu.cue.util.text.CUERenderer;
 
 /**
  * Created by Jalal on 1/28/2017.
  */
-public class MainActivity extends ARActivity implements LocationListener {
+public class MainActivity extends ARActivity implements LocationListener, SensorEventListener {
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 133;
     /**
@@ -30,6 +34,7 @@ public class MainActivity extends ARActivity implements LocationListener {
     private CUERenderer cueRenderer = new CUERenderer(this);
 
     private CUELocationService locationService;
+    private CUESensorService sensorService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class MainActivity extends ARActivity implements LocationListener {
         }
 
         this.locationService = CUELocationService.getInstance(this);
+        this.sensorService = CUESensorService.getInstance(this);
     }
 
     @Override
@@ -50,6 +56,7 @@ public class MainActivity extends ARActivity implements LocationListener {
         super.onResume();
 
         this.locationService.start();
+        this.sensorService.start();
 
     }
 
@@ -57,6 +64,7 @@ public class MainActivity extends ARActivity implements LocationListener {
     public void onStop() {
         super.onStop();
         this.locationService.stop();
+        this.sensorService.stop();
     }
 
     /**
@@ -102,5 +110,19 @@ public class MainActivity extends ARActivity implements LocationListener {
         Log.d("cuear", "received new location");
         if(location != null)
             cueRenderer.setText(location.toString());
+    }
+
+    // when any sensor gets a new value this function is run
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Log.d("Jalal","Jalal is lame");
+        float azimuthRadians = event.values[0];
+        Float azimuthDegrees = (azimuthRadians * 180) / (float) Math.PI;
+        Log.d("Azimuth", azimuthDegrees.toString());
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        Log.d("Will", "Will is cooler than Jalal");
     }
 }
