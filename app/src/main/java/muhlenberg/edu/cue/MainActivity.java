@@ -1,7 +1,9 @@
 package muhlenberg.edu.cue;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,6 +23,10 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
 import muhlenberg.edu.cue.util.text.CUERenderer;
+import muhlenberg.edu.cue.util.text.FeedReaderContract;
+import muhlenberg.edu.cue.util.text.FeedReaderDbHelper;
+
+import static muhlenberg.edu.cue.ARSimpleApplication.getContext;
 
 /**
  * Created by Jalal on 1/28/2017.
@@ -35,6 +41,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     private CUELocationService locationService;
     private CUESensorService sensorService;
+    private Database db = new Database();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
         this.locationService = CUELocationService.getInstance(this);
         this.sensorService = CUESensorService.getInstance(this);
+
+        db.POI();
     }
 
     @Override
