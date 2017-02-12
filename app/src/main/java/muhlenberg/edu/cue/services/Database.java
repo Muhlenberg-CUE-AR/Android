@@ -1,15 +1,14 @@
-package muhlenberg.edu.cue;
+package muhlenberg.edu.cue.services;
 
 /**
  * Created by jason on 2/7/17.
  */
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.sqlite.*;
 
-import muhlenberg.edu.cue.util.text.FeedReaderContract;
-import muhlenberg.edu.cue.util.text.FeedReaderDbHelper;
+import muhlenberg.edu.cue.services.FeedReaderContract;
+import muhlenberg.edu.cue.services.FeedReaderDbHelper;
 
 import static muhlenberg.edu.cue.ARSimpleApplication.getContext;
 

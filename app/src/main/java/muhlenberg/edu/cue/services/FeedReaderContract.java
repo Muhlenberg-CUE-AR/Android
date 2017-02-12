@@ -1,15 +1,7 @@
-package muhlenberg.edu.cue.util.text;
+package muhlenberg.edu.cue.services;
 
-
-import android.content.ContentValues;
-import android.content.Context;
-
-import android.database.sqlite.*;
 
 import android.provider.BaseColumns;
-
-import static muhlenberg.edu.cue.ARSimpleApplication.getContext;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.*;
 
 /**
  * Created by jason on 2/7/17.

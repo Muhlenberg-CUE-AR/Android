@@ -1,17 +1,17 @@
-package muhlenberg.edu.cue.util.text;
+package muhlenberg.edu.cue.services;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.COLUMN_NAME_ACTIVATION_RANGE;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.COLUMN_NAME_LATITUDE;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.COLUMN_NAME_LONGITUDE;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.COLUMN_NAME_LONG_DESC;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.COLUMN_NAME_NAME;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
-import static muhlenberg.edu.cue.util.text.FeedReaderContract.FeedEntry.TABLE_NAME;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_ACTIVATION_RANGE;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_LATITUDE;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_LONGITUDE;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_LONG_DESC;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_NAME;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
+import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.TABLE_NAME;
 
 public class FeedReaderDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
