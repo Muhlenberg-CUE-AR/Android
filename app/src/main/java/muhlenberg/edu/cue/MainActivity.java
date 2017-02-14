@@ -18,9 +18,9 @@ import com.google.android.gms.location.LocationListener;
 import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import muhlenberg.edu.cue.services.CUEDatabaseService;
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
-import muhlenberg.edu.cue.services.Database;
 import muhlenberg.edu.cue.util.text.CUERenderer;
 
 /**
