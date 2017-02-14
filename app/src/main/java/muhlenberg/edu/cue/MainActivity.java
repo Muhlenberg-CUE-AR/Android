@@ -17,13 +17,10 @@ import com.google.android.gms.location.LocationListener;
 
 import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraEventListener;
-import org.artoolkit.ar.base.camera.CaptureCameraPreview;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
-import muhlenberg.edu.cue.services.CameraService;
-import muhlenberg.edu.cue.services.Database;
 import muhlenberg.edu.cue.util.text.CUERenderer;
 
 /**
@@ -116,6 +113,10 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         Log.d("cuear", "received new location");
         if(location != null)
             cueRenderer.setText(location.toString());
+        // check if camera is open
+
+        // calculate field of view
+        sensorService.calculateFieldOfView(this);
     }
 
     // when any sensor gets a new value this function is run
