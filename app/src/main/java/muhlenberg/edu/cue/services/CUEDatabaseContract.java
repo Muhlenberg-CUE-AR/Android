@@ -6,13 +6,13 @@ import android.provider.BaseColumns;
 /**
  * Created by jason on 2/7/17.
  */
-public final class FeedReaderContract {
+public final class CUEDatabaseContract {
 
 
 
     // To prevent someone from accidentally instantiating the contract class,
     // make the constructor private.
-    private FeedReaderContract() {
+    private CUEDatabaseContract() {
     }
 
     /* Inner class that defines the table contents */

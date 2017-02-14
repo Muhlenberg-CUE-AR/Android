@@ -136,4 +136,13 @@ public class CUELocationService extends AbstractService {
         locationRequest.setFastestInterval(5000);
         return locationRequest;
     }
+
+    /**
+     * Checks to see if Google API Client is connected or connecting
+     * Determines the state of this service
+     * @return
+     */
+    public boolean isStarted() {
+        return googleApiClient.isConnected() || googleApiClient.isConnecting();
+    }
 }

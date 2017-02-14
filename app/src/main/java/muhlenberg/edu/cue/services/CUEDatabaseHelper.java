@@ -5,15 +5,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_ACTIVATION_RANGE;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_LATITUDE;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_LONGITUDE;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_LONG_DESC;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_NAME;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
-import static muhlenberg.edu.cue.services.FeedReaderContract.FeedEntry.TABLE_NAME;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_RANGE;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
+import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.TABLE_NAME;
 
-public class FeedReaderDbHelper extends SQLiteOpenHelper {
+public class CUEDatabaseHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     _ID + " INTEGER PRIMARY KEY," +
@@ -24,14 +24,13 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
                     COLUMN_NAME_LONGITUDE + " NUM)" +
                     COLUMN_NAME_ACTIVATION_RANGE + " NUM," ;
 
-    private static final String SQL_DELETE_ENTRIES =
-            "DROP TABLE IF EXISTS " + TABLE_NAME;
+    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "FeedReader.db";
 
-    public FeedReaderDbHelper(Context context) {
+    public CUEDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {
