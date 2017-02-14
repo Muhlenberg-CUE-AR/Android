@@ -16,17 +16,20 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationListener;
 
 import org.artoolkit.ar.base.ARActivity;
+import org.artoolkit.ar.base.camera.CameraEventListener;
+import org.artoolkit.ar.base.camera.CaptureCameraPreview;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
+import muhlenberg.edu.cue.services.CameraService;
 import muhlenberg.edu.cue.services.Database;
 import muhlenberg.edu.cue.util.text.CUERenderer;
 
 /**
  * Created by Jalal on 1/28/2017.
  */
-public class MainActivity extends ARActivity implements LocationListener, SensorEventListener {
+public class MainActivity extends ARActivity implements LocationListener, SensorEventListener, CameraEventListener {
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 133;
     /**
@@ -59,6 +62,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
         this.locationService.start(this);
         this.sensorService.start(this);
+        getCameraPreview();
 
     }
 
@@ -117,7 +121,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     // when any sensor gets a new value this function is run
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.d("Jalal","Jalal is lame");
         float azimuthRadians = event.values[0];
         Float azimuthDegrees = (azimuthRadians * 180) / (float) Math.PI;
         Log.d("Azimuth", azimuthDegrees.toString());
@@ -127,4 +130,5 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.d("Will", "Will is cooler than Jalal");
     }
+
 }

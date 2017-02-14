@@ -271,5 +271,9 @@ public class CaptureCameraPreview extends SurfaceView implements SurfaceHolder.C
 
     	
 	}
+
+    public Camera getCamera(){
+        return this.camera;
+    }
  
 }
