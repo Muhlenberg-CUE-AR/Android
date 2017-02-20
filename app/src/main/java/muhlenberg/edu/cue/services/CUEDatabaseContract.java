@@ -23,7 +23,10 @@ public final class CUEDatabaseContract {
         public static final String COLUMN_NAME_LONG_DESC = "LongDesc";
         public static final String COLUMN_NAME_LATITUDE = "Latitude";
         public static final String COLUMN_NAME_LONGITUDE = "Longitude";
-        public static final String COLUMN_NAME_ACTIVATION_RANGE = "ActivationRange";
+        public static final String COLUMN_NAME_ACTIVATION_BOX1 = "ActivationBox1";
+        public static final String COLUMN_NAME_ACTIVATION_BOX2 = "ActivationBox2";
+        public static final String COLUMN_NAME_ACTIVATION_BOX3 = "ActivationBox3";
+        public static final String COLUMN_NAME_ACTIVATION_BOX4 = "ActivationBox4";
 
     }
 
