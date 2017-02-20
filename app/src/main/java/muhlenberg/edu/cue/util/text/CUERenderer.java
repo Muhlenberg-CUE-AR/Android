@@ -11,6 +11,7 @@ import android.opengl.GLU;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
+import org.artoolkit.ar.base.rendering.Cube;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -21,6 +22,8 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
     private GLText glText;
     private Context context;
+
+    private Cube cube = new Cube(40.0f, 0.0f, 0.0f, 20.0f);
 
     private String text;
     // square to draw to the screen
@@ -73,7 +76,8 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         gl.glDisable(GL10.GL_BLEND);                  // Disable Alpha Blend
         gl.glDisable(GL10.GL_TEXTURE_2D);             // Disable Texture Mapping
 
-        mSquare.draw();     // Draws the square to the screen
+        //mSquare.draw();     // Draws the square to the screen
+        draw(gl);
     }
 
     public void onSurfaceChanged(GL10 gl, int x, int y) {
@@ -117,6 +121,26 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         GLES20.glCompileShader(shader);
 
         return shader;
+    }
+
+    /**
+     * Override the draw function from ARRenderer.
+     */
+    @Override
+    public void draw(GL10 gl) {
+
+        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+        // Apply the ARToolKit projection matrix
+        gl.glMatrixMode(GL10.GL_PROJECTION);
+        gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+
+        gl.glEnable(GL10.GL_CULL_FACE);
+        gl.glShadeModel(GL10.GL_SMOOTH);
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        gl.glFrontFace(GL10.GL_CW);
+
+        cube.draw(gl);
     }
 
 }
