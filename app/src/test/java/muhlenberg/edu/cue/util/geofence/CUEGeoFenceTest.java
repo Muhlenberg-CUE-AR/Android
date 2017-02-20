@@ -1,5 +1,6 @@
 package muhlenberg.edu.cue.util.geofence;
 
+import android.gesture.GestureOverlayView;
 import android.location.Location;
 import android.location.LocationManager;
 import android.test.AndroidTestRunner;
@@ -13,32 +14,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import muhlenberg.edu.cue.util.location.CUELocation;
+
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by Jalal on 2/16/2017.
  */
 @RunWith(JUnit4.class)
 public class CUEGeoFenceTest {
-    
+    //correct coordinates of Muhlenberg campus
+    CUELocation nw = new CUELocation(40.598346, -75.514447);
+    CUELocation ne = new CUELocation(40.600081, -75.508160);
+    CUELocation sw = new CUELocation(40.595600, -75.513138);
+    CUELocation se = new CUELocation(40.597343, -75.506840);
+
+
     @Test
     public void testConstructor() {
-        Location w = new Location("");
-        w.setLatitude(0);
-        w.setLongitude(0);
-
-        Location x = new Location("");
-        x.setLatitude(0);
-        x.setLongitude(0);
-
-        Location y = new Location("");
-        y.setLatitude(0);
-        y.setLongitude(0);
-
-        Location z = new Location("");
-        z.setLatitude(0);
-        z.setLongitude(0);
+        CUELocation w = new CUELocation(0,0);
+        CUELocation x = new CUELocation(0,0);
+        CUELocation y = new CUELocation(0,0);
+        CUELocation z = new CUELocation(0,0);
 
         CUEGeoFence fence = new CUEGeoFence(w, x, y, z);
         assertEquals(w.getLatitude(), fence.getCorners()[0].getLatitude());
@@ -52,7 +52,7 @@ public class CUEGeoFenceTest {
         assertEquals(z.getLongitude(), fence.getCorners()[3].getLongitude());
 
 
-        Location[] arr = {w, x, y, z};
+        CUELocation[] arr = {w, x, y, z};
         CUEGeoFence fence2 = new CUEGeoFence(arr);
 
         assertEquals(w.getLatitude(), fence2.getCorners()[0].getLatitude());
@@ -74,45 +74,31 @@ public class CUEGeoFenceTest {
     }
 
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void testSort() {
-        // north west
-        Location w = new Location("");
-        w.setLatitude(-90);
-        w.setLongitude(90);
+    public void testValidate() {
+        CUELocation[] correctCorners = {nw, ne, sw, se};
+        CUEGeoFence correctFence = new CUEGeoFence(correctCorners);
 
-        // north east
-        Location x = new Location("");
-        x.setLatitude(90);
-        x.setLongitude(90);
+        assertTrue(correctFence.validate(correctCorners, CUEGeoFence.VALIDATION_TOLERANCE));
 
-        //south west
-        Location y = new Location("");
-        y.setLatitude(-90);
-        y.setLongitude(-90);
+        CUELocation[] incorrectCorners = {sw, nw, se, new CUELocation(0,0)};
+        CUEGeoFence incorrectFence = new CUEGeoFence(incorrectCorners);
+        assertFalse(incorrectFence.validate(incorrectCorners, CUEGeoFence.VALIDATION_TOLERANCE));
 
-        // south east
-        Location z = new Location("");
-        z.setLatitude(90);
-        z.setLongitude(-90);
-
-        ArrayList<Location> list = new ArrayList();
-        list.add(w);
-        list.add(x);
-        list.add(y);
-        list.add(z);
-        Collections.shuffle(list);
-
-        Location[] corners = new Location[4];
-        for(int i=0; i<4; i++)
-            corners[i] = list.get(i);
-
-        Location[] sorted = CUEGeoFence.sort(corners);
-        assertEquals(w, sorted[0]);
-        assertEquals(x, sorted[1]);
-        assertEquals(y, sorted[2]);
-        assertEquals(z, sorted[3]);
     }
 
+    @Test
+    public void testInsideBoundingBox() {
+        CUELocation validInside = new CUELocation(40.597571, -75.510402);
+        CUELocation[] corners = {nw, ne, sw, se};
+        CUEGeoFence fence = new CUEGeoFence(corners);
+        assertTrue(fence.isInsideBoundingBox(corners, validInside));
+
+        CUELocation invalidInside = new CUELocation(0,0);
+        assertFalse(fence.isInsideBoundingBox(corners, invalidInside));
+
+        CUELocation[] nullCorners = new CUELocation[4];
+        CUEGeoFence invalidFence = new CUEGeoFence(nullCorners);
+        assertFalse(invalidFence.isInsideBoundingBox(nullCorners, invalidInside));
+    }
 }
