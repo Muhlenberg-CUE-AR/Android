@@ -17,6 +17,18 @@ public class CUEDatabaseService extends AbstractService {
     private SQLiteDatabase sql;
     private CUEDatabaseHelper mDbHelper;
 
+    // Constants for retrieving information from the database
+    public final static int ID = 0;
+    public final static int NAME = 1;
+    public final static int SHORT_DESC = 2;
+    public final static int LONG_DESC = 3;
+    public final static int LATITUDE = 4;
+    public final static int LONGITUDE = 5;
+    public final static int ACTIVATION_BOX_NE = 6;
+    public final static int ACTIVATION_BOX_NW = 7;
+    public final static int ACTIVATION_BOX_SE = 8;
+    public final static int ACTIVATION_BOX_SW = 9;
+
     // Creates an instance of the database
     public CUEDatabaseService getInstance() {
         if (instance == null) {
@@ -38,13 +50,13 @@ public class CUEDatabaseService extends AbstractService {
 
         /**
          *  Format:
-         *  insertPOI(name, short desc, long desc, latitude, longitude, activation box coordinates 1-4);
+         *  insertPOI( id, name, short desc, long desc, latitude, longitude, activation box coordinates 1-4);
          */
 
-        insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
-        insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
-        insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
-        insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
+        insertPOI("Trumbower", "Building", "Math and Science", 1, 1, "1.0, 1.0", "1.0, 1.0", "1.0, 1.0", "1.0, 1.0");
+        // insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
+        // insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
+        // insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
 
     }
 
@@ -53,7 +65,7 @@ public class CUEDatabaseService extends AbstractService {
         then inserting it into the table.
      */
     public long insertPOI(String name, String shortDesc, String longDesc, float latitude, float longitude,
-                          float activationBox1, float activationBox2, float activationBox3, float activationBox4) {
+                          String activationBox1, String activationBox2, String activationBox3, String activationBox4) {
 
         ContentValues values = new ContentValues();
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME, name);
@@ -76,7 +88,7 @@ public class CUEDatabaseService extends AbstractService {
         This will allow things from the database to be read
         INCOMPLETE
      */
-    public Cursor readPOI(String name) {
+    public Building readPOI(String name) {
         this.sql = mDbHelper.getReadableDatabase();
 
         // The rows that will be read (which is every row in this case)
@@ -109,8 +121,20 @@ public class CUEDatabaseService extends AbstractService {
                 null
         );
 
-        // cursor needs to close, this may need to be changed.
-        return cursor;
+        // creates a building out of the query to the db and returns it
+
+        Building b1 = new Building(cursor.getInt(ID),           // Gets building id
+                                   cursor.getString(NAME),      // Gets building name
+                                   cursor.getString(SHORT_DESC),// Gets building short description
+                                   cursor.getString(LONG_DESC), // Gets building long description
+                                   cursor.getFloat(LATITUDE),   // Gets building latitude
+                                   cursor.getFloat(LONGITUDE),  // Gets building longitude
+                                   cursor.getString(ACTIVATION_BOX_NE), // Gets the activation boxes as string
+                                   cursor.getString(ACTIVATION_BOX_NW),
+                                   cursor.getString(ACTIVATION_BOX_SE),
+                                   cursor.getString(ACTIVATION_BOX_SW));
+        cursor.close();
+        return b1;
     }
 
     /*

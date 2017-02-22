@@ -19,10 +19,9 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import muhlenberg.edu.cue.services.CUEDatabaseService;
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
-import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
-import muhlenberg.edu.cue.util.location.CUELocation;
 import muhlenberg.edu.cue.util.text.CUERenderer;
 
 /**
@@ -38,7 +37,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     private CUELocationService locationService;
     private CUESensorService sensorService;
-    private CUEGeoFence testFence;
+    private CUEDatabaseService databaseService;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,21 +52,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
         this.locationService = CUELocationService.getInstance(this);
         this.sensorService = CUESensorService.getInstance(this);
-
-        /*
-        Moyer coords
-        nw = 40.598097, -75.509105
-        ne = 40.598305, -75.508346
-        sw = 40.597551, -75.508831
-        se = 40.597747, -75.508134
-         */
-
-        CUELocation[] moyer = {new CUELocation(40.598097, -75.509105),
-            new CUELocation(40.598305, -75.508346),
-            new CUELocation(40.597551, -75.508831),
-            new CUELocation(40.597747, -75.508134)};
-
-        testFence = new CUEGeoFence(moyer);
 
     }
 
@@ -128,13 +113,13 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     @Override
     public void onLocationChanged(Location location) {
         Log.d("cuear", "received new location");
-        if(location != null && testFence.isInsideBoundingBox(testFence.getCorners(), new CUELocation(location))) {
-            cueRenderer.setText("Welcome to Moyer!");
-            Log.d("cuear", "made it to moyer!");
-        }
-        else {
-            Log.d("cuear", "not in moyer");
-        }
+        if(location != null)
+            cueRenderer.setText(location.toString());
+        // check if camera is open
+
+        // calculate field of view
+        sensorService.calculateFieldOfView(this);
+        databaseService.readPOI("Trumbower");
     }
 
     // when any sensor gets a new value this function is run
