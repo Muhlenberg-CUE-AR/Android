@@ -2,6 +2,8 @@ package muhlenberg.edu.cue.util.geofence;
 
 import android.util.Log;
 
+import java.util.Arrays;
+
 import muhlenberg.edu.cue.util.location.CUELocation;
 
 /**
@@ -16,11 +18,39 @@ public class CUEGeoFence {
         this.corners = new CUELocation[4];
     }
 
-    public CUEGeoFence(CUELocation[] corners) {
+    /**
+     * Creates a geofence out of an array of CUELocations. The first three locations are used to
+     * calculate the fourth so accuracy is maintained. It is recommended the locations are listed in
+     * order of Northwest, Northeast, and Southwest. The last element will be overwritten if it contains
+     * an object.
+     * @param corners Array of length 4 of CUELocation objects.
+     */
+    public CUEGeoFence(CUELocation[] corners) throws Exception {
         this.corners = corners;
-        validate(corners, VALIDATION_TOLERANCE);
+        if(corners.length != 4) {
+            throw new Exception("Array needs to be of length 4!");
+        }
+        if(!validate(corners[0], corners[1], corners[2])) {
+            Log.d("cuear", "Corners do not form a right angle! Calculations may be off in the future.");
+        }
+
+        if(corners == null || corners[0] == null || corners[1] == null || corners[2] == null) {
+            Log.d("cuear", "passed a null corner array or it  had null values. Please fix to continue");
+            throw new RuntimeException();
+        }
+        this.corners[3] = calcLastCorner(this.corners[0], this.corners[1], this.corners[2]);
+
     }
 
+    /**
+     * Create a geofence using 3 coordinates, preferably the NorthWest, NorthEast, and SouthWest
+     * coordinates. Most calculations will operate fine without being in order, but some may fail
+     * or be inaccurate. The fourth point of the geofence is calculated from the first three to
+     * maintain accuracy.
+     * @param nw Northwest point
+     * @param ne Northeast point
+     * @param sw Southwest point
+     */
     public CUEGeoFence(CUELocation nw, CUELocation ne, CUELocation sw) {
         this();
 
@@ -28,7 +58,11 @@ public class CUEGeoFence {
         this.corners[1] = ne;
         this.corners[2] = sw;
 
-        validate(this.corners, VALIDATION_TOLERANCE);
+        if(!validate(nw, ne, sw)) {
+            Log.d("cuear", "Corners do not form a right angle! Calculations may be off in the future.");
+        }
+
+        this.corners[3] = calcLastCorner(nw, ne, sw);
     }
 
 
@@ -37,7 +71,7 @@ public class CUEGeoFence {
      * Find the last point of a rectangle given 3 points. This allows us to not have
      * perfect precision when measuring lat/lng values in the real world and provides
      * more accuracy in bounds calcualtions.
-     * Although the algorithmn does not require the points to be in order, it is
+     * Although the algorithm does not require the points to be in order, it is
      * recommended they are provided correctly to maintain readability
      * @param nw Northwest point
      * @param ne Northeast point
@@ -54,66 +88,54 @@ public class CUEGeoFence {
                 ^ Double.doubleToLongBits(sw.getLongitude()));
 
         return new CUELocation(x, y);
-
     }
 
     /**
-     * @see <a href=http://www.stackoverflow.com/a/2304031/7537946>stackoverflow</a>
-     * Checks if the corners make a valid rectangle, ie each side is an approximately consistent length
-     * This is done by finding the center of mass of the rectangle and measuring the distance to each
-     * corner. It should be equidistant from each corner, within a floating point margin of error.
-     * <p>
-     * This method is called from the constructor, but is also provided publicly for convenience
-     *
-     * @param corners   array of corners representing the bouding box
-     * @param tolerance the magnitude of acceptable difference between side lengths. should be fairly
-     *                  small
-     * @return true if the corners form a rectangle, false otherwise
+     * Use the Distance formula to determine if the 3 provided points form a right angle
+     * Although the algorithm does not require the points to be in order, it is
+     * recommended they are provided correctly to maintain readability
+     * @param nw Northwest point
+     * @param ne Northeast point
+     * @param sw Southwest point
+     * @return true if the corners form a right angle, false otherwise
      */
-    public static  boolean validate(CUELocation[] corners, double tolerance) {
+    public static  boolean validate(CUELocation nw, CUELocation ne, CUELocation sw) {
         //check if corners are valid and operable
-        if (corners.length != 4 || corners[0] == null || corners[1] == null
-                || corners[2] == null || corners[3] == null) {
-            Log.d("cuear", "Corners are null in validate() of CUEGeoFence! Has the object been initialized yet?");
+        if (nw == null || ne == null || sw == null) {
+            Log.d("cuear", "Corners are null in validate() of CUEGeoFence! Have the objects been initialized yet?");
             return false;
         }
 
-        double cx = 0.0, cy = 0.0;
-        for (CUELocation corner : corners) {
-            cx += corner.getLatitude();
-            cy += corner.getLongitude();
-        }
-        cx /= corners.length;
-        cy /= corners.length;
+        //square the 2 smaller distance and sum them.
+        //if they equal the square of the larger distance, the points form a right angle
 
-        double sqD1 = Math.pow(cx - corners[0].getLatitude(), 2) - Math.pow(cy - corners[0].getLongitude(), 2);
-        double sqD2 = Math.pow(cx - corners[1].getLatitude(), 2) - Math.pow(cy - corners[1].getLongitude(), 2);
-        double sqD3 = Math.pow(cx - corners[2].getLatitude(), 2) - Math.pow(cy - corners[2].getLongitude(), 2);
-        double sqD4 = Math.pow(cx - corners[3].getLatitude(), 2) - Math.pow(cy - corners[3].getLongitude(), 2);
+        double x = Math.sqrt(Math.pow(ne.getLatitude() - nw.getLatitude(), 2) + Math.pow(ne.getLongitude() - nw.getLongitude(), 2));
+        double y = Math.sqrt(Math.pow(nw.getLatitude() - sw.getLatitude(), 2) + Math.pow(nw.getLongitude() - sw.getLongitude(), 2));
+        double z = Math.sqrt(Math.pow(ne.getLatitude() - sw.getLatitude(), 2) + Math.pow(ne.getLongitude() - sw.getLongitude(), 2));
 
-        return Math.abs(sqD1 - sqD2) <= tolerance
-                && Math.abs(sqD1 - sqD3) <= tolerance
-                && Math.abs(sqD1 - sqD4) <= tolerance;
+        double[] dists = {x, y, z};
+        Arrays.sort(dists);
 
+        return Math.abs(dists[0] * dists[0] + dists[1] * dists[1] - dists[2] * dists[2]) < 0.001;
     }
 
     /**
-     * {@link http://math.stackexchange.com/a/190373}
+     * @see <a href="http://math.stackexchange.com/a/190373">Source</a>
      * Tests if a point is inside the bounding box (rectangle) formed by the corners.
      *
      * @param corners
      * @param point
      * @return
      */
-    public boolean isInsideBoundingBox(CUELocation[] corners, CUELocation point) {
+    public static boolean isInsideBoundingBox(CUELocation[] corners, CUELocation point) {
         if (corners.length != 4 || corners[0] == null || corners[1] == null
                 || corners[2] == null || corners[3] == null || point == null) {
             Log.d("cuear", "Null point or corners passed to isInsideBoundingBox() of CUEGeoFence! Is locationlistener ready to receive input?");
             return false;
         }
-        double[] a = {this.corners[0].getLatitude(), this.corners[0].getLongitude()};
-        double[] b = {this.corners[1].getLatitude(), this.corners[1].getLongitude()};
-        double[] c = {this.corners[2].getLatitude(), this.corners[2].getLongitude()};
+        double[] a = {corners[0].getLatitude(), corners[0].getLongitude()};
+        double[] b = {corners[1].getLatitude(), corners[1].getLongitude()};
+        double[] c = {corners[2].getLatitude(), corners[2].getLongitude()};
 
         double[] m = {point.getLatitude(), point.getLongitude()};
 

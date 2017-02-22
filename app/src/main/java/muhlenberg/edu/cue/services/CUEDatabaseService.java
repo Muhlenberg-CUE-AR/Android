@@ -134,6 +134,8 @@ public class CUEDatabaseService extends AbstractService {
                                    cursor.getString(ACTIVATION_BOX_SE),
                                    cursor.getString(ACTIVATION_BOX_SW));
         cursor.close();
+
+
         return b1;
     }
 
