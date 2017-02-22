@@ -1,5 +1,10 @@
 package muhlenberg.edu.cue.services;
 
+import android.graphics.Point;
+import android.util.Log;
+
+import muhlenberg.edu.cue.util.location.CUELocation;
+
 /**
  * Created by Willy on 2/20/2017.
  * Jalal is lame
@@ -13,13 +18,12 @@ public class Building {
     private String longDesc;
     private Float lat;
     private Float lon;
-    private String activationBoxNE;
-    private String activationBoxNW;
-    private String activationBoxSE;
-    private String activationBoxSW;
+    private CUELocation activationBoxNE;
+    private CUELocation activationBoxNW;
+    private CUELocation activationBoxSE;
+    private CUELocation activationBoxSW;
 
-    public Building(int id, String name, String shortDesc, String longDesc, Float lat, Float lon,
-                    String activationBoxNE, String activationBoxNW, String activationBoxSE, String activationBoxSW){
+    public Building(int id, String name, String shortDesc, String longDesc, Float lat, Float lon){
         // sets all fields given through the constructor
         this.id = id;
         this.name = name;
@@ -27,10 +31,18 @@ public class Building {
         this.longDesc = longDesc;
         this.lat = lat;
         this.lon = lon;
-        this.activationBoxNE = activationBoxNE;
+        /*this.activationBoxNE = activationBoxNE;
         this.activationBoxNW = activationBoxNW;
         this.activationBoxSE = activationBoxSE;
-        this.activationBoxSW = activationBoxSW;
+        this.activationBoxSW = activationBoxSW;*/
+    }
+
+    // sets the lat, lng for the activation box
+    public void addActivationBoxCoordinate(CUELocation ne, CUELocation nw, CUELocation se, CUELocation sw){
+        this.activationBoxNE = ne;
+        this.activationBoxNW = nw;
+        this.activationBoxSE = se;
+        this.activationBoxSW = sw;
     }
 
     // getter methods

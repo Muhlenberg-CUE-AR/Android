@@ -4,6 +4,8 @@ import android.location.Location;
 
 /**
  * Created by Jalal on 2/18/2017.
+ * Added constructor for strings to points WPS 2/22/2017
+ * Jalal is lame
  */
 
 public class CUELocation {
@@ -25,6 +27,12 @@ public class CUELocation {
         this.lat = lat;
         this.lng = lng;
         this.altitude = altitude;
+    }
+
+    public CUELocation(String coordinates) {
+        String[] coords = coordinates.split(",");
+        this.lat = Float.parseFloat(coords[0]);
+        this.lng = Float.parseFloat(coords[1]);
     }
 
     public double getLatitude() {
