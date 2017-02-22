@@ -19,6 +19,7 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import muhlenberg.edu.cue.services.CUEDatabaseService;
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
 import muhlenberg.edu.cue.util.text.CUERenderer;
@@ -36,6 +37,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     private CUELocationService locationService;
     private CUESensorService sensorService;
+    private CUEDatabaseService databaseService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,6 +119,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
         // calculate field of view
         sensorService.calculateFieldOfView(this);
+        databaseService.readPOI("Trumbower");
     }
 
     // when any sensor gets a new value this function is run
