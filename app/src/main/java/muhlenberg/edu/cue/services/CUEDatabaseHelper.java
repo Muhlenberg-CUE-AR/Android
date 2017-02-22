@@ -29,10 +29,10 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_NAME_LONG_DESC + " TEXT," +
                     COLUMN_NAME_LATITUDE + " NUM," +
                     COLUMN_NAME_LONGITUDE + " NUM," +
-                    COLUMN_NAME_ACTIVATION_BOX1 + " NUM," +
-                    COLUMN_NAME_ACTIVATION_BOX2 + " NUM," +
-                    COLUMN_NAME_ACTIVATION_BOX3 + " NUM," +
-                    COLUMN_NAME_ACTIVATION_BOX4 + " NUM)" ;
+                    COLUMN_NAME_ACTIVATION_BOX1 + " TEXT," +
+                    COLUMN_NAME_ACTIVATION_BOX2 + " TEXT," +
+                    COLUMN_NAME_ACTIVATION_BOX3 + " TEXT," +
+                    COLUMN_NAME_ACTIVATION_BOX4 + " TEXT)" ;
 
     //Used to remove the table when needed
     private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;

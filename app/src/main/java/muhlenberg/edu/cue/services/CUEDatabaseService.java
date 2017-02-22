@@ -9,6 +9,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
 
+import muhlenberg.edu.cue.util.location.CUELocation;
+
 import static muhlenberg.edu.cue.ARSimpleApplication.getContext;
 
 public class CUEDatabaseService extends AbstractService {
@@ -128,11 +130,20 @@ public class CUEDatabaseService extends AbstractService {
                                    cursor.getString(SHORT_DESC),// Gets building short description
                                    cursor.getString(LONG_DESC), // Gets building long description
                                    cursor.getFloat(LATITUDE),   // Gets building latitude
-                                   cursor.getFloat(LONGITUDE),  // Gets building longitude
-                                   cursor.getString(ACTIVATION_BOX_NE), // Gets the activation boxes as string
+                                   cursor.getFloat(LONGITUDE));  // Gets building longitude
+                                   /*cursor.getString(ACTIVATION_BOX_NE), // Gets the activation boxes as string
                                    cursor.getString(ACTIVATION_BOX_NW),
                                    cursor.getString(ACTIVATION_BOX_SE),
-                                   cursor.getString(ACTIVATION_BOX_SW));
+                                   cursor.getString(ACTIVATION_BOX_SW));*/
+
+        // uses the string to get a lat and lon for the location
+        CUELocation NE = new CUELocation(cursor.getString(ACTIVATION_BOX_NE));
+        CUELocation NW = new CUELocation(cursor.getString(ACTIVATION_BOX_NW));
+        CUELocation SE = new CUELocation(cursor.getString(ACTIVATION_BOX_SE));
+        CUELocation SW = new CUELocation(cursor.getString(ACTIVATION_BOX_SW));
+
+        b1.addActivationBoxCoordinate(NE, NW, SE, SW);
+
         cursor.close();
 
 
