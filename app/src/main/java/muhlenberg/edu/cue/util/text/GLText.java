@@ -240,8 +240,8 @@ public class GLText {
 
     public void begin(float red, float green, float blue, float alpha) {
         gl.glColor4f(red, green, blue, alpha);        // Set Color+Alpha
-        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);  // Bind the Texture
-        batch.beginBatch();                             // Begin Batch
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
+        batch.beginBatch();
     }
 
     public void end() {

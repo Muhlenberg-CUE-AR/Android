@@ -20,11 +20,10 @@ import static muhlenberg.edu.cue.util.text.Square.COORDS_PER_VERTEX;
 public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
     private GLText glText;
+    private GLText largeText;
     private Context context;
 
     private String text;
-    // square to draw to the screen
-    private Square mSquare;
 
     public CUERenderer(Context context) {
         super();
@@ -44,12 +43,11 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         super.onSurfaceCreated(gl, config);
 
         glText = new GLText(gl, context.getAssets());
-
+        largeText = new GLText(gl, context.getAssets());
         // Create Font (Height: 14 Pixels / X+Y Padding 2 Pixels)
-        glText.load("Roboto-Regular.ttf", 14, 2, 2);
+        glText.load("Roboto-Regular.ttf", 30, 2, 2);
+        largeText.load("Roboto-Regular.ttf", 120, 2, 2);
 
-        // initialize Square to be drawn
-        mSquare = new Square();
     }
 
     public void onDrawFrame(GL10 gl) {
@@ -57,23 +55,35 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
         // Set to ModelView mode
         gl.glMatrixMode(GL10.GL_MODELVIEW);
-        gl.glLoadIdentity();
+        gl.glLoadIdentity();  //reset the current matrix
 
         // enable texture + alpha blending
         // NOTE: this is required for text rendering! we could incorporate it into
         // the GLText class, but then it would be called multiple times (which impacts performance).
         gl.glEnable(GL10.GL_TEXTURE_2D);
         gl.glEnable(GL10.GL_BLEND);
-        gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);  // Set Alpha Blend Function
+        gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
         glText.begin(1.0f, 1.0f, 1.0f, 1.0f);         // Begin Text Rendering (Set Color WHITE)
-        glText.draw(this.text, 0, 0, 0);
+        glText.draw("Hello World!", 0, 0, 0);
         glText.end();
 
-        gl.glDisable(GL10.GL_BLEND);                  // Disable Alpha Blend
-        gl.glDisable(GL10.GL_TEXTURE_2D);             // Disable Texture Mapping
+        glText.begin(0, 1.0f, 1.0f, 1.0f);
+        glText.draw("Goodbye World!", 0, 100, 0);
+        glText.end();
 
-        mSquare.draw();     // Draws the square to the screen
+        largeText.begin(1.0f, 0, 1.0f, 1.0f);
+        largeText.draw("Hello Large World!", -300, -100, 0);
+        largeText.end();
+
+        largeText.begin(1.0f, 1.0f, 0, 1.0f);
+        largeText.draw("Goodbye Large World!", -400, 210, 0);
+        largeText.end();
+
+
+        gl.glDisable(GL10.GL_BLEND);
+        gl.glDisable(GL10.GL_TEXTURE_2D);
+
     }
 
     public void onSurfaceChanged(GL10 gl, int x, int y) {
