@@ -8,6 +8,7 @@ import android.test.AndroidTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.runners.Suite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import static junit.framework.Assert.assertTrue;
  * Created by Jalal on 2/16/2017.
  */
 @RunWith(JUnit4.class)
+
 public class CUEGeoFenceTest {
     //correct coordinates of Muhlenberg campus
     CUELocation nw = new CUELocation(40.598346, -75.514447);
@@ -44,6 +46,16 @@ public class CUEGeoFenceTest {
 
         CUELocation bad = new CUELocation(10, 10);
         assertFalse(CUEGeoFence.validate(nw, sw, bad));
+
+        assertTrue(CUEGeoFence.validate(this.nw, this.ne, this.sw));
+
+
+        CUELocation eastNW = new CUELocation(40.598998, -75.509014);
+        CUELocation eastNE = new CUELocation(40.599246, -75.508083);
+        CUELocation eastSW = new CUELocation(40.598233, -75.508613);
+
+        assertTrue(CUEGeoFence.validate(eastNW, eastNE, eastSW));
+
     }
 
     @Test

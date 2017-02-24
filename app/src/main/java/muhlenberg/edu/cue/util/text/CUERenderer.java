@@ -3,31 +3,22 @@
 
 package muhlenberg.edu.cue.util.text;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
-import org.artoolkit.ar.base.rendering.Cube;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-import static muhlenberg.edu.cue.util.text.Square.COORDS_PER_VERTEX;
 
 public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
     private GLText glText;
     private Context context;
 
-    private Cube cube = new Cube(40.0f, 0.0f, 0.0f, 20.0f);
-
     private String text;
-    // square to draw to the screen
-    private Square mSquare;
 
     public CUERenderer(Context context) {
         super();
@@ -51,10 +42,9 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         // Create Font (Height: 14 Pixels / X+Y Padding 2 Pixels)
         glText.load("Roboto-Regular.ttf", 14, 2, 2);
 
-        // initialize Square to be drawn
-        mSquare = new Square();
     }
 
+    @Override
     public void onDrawFrame(GL10 gl) {
         super.onDrawFrame(gl);
 
@@ -75,11 +65,9 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
         gl.glDisable(GL10.GL_BLEND);                  // Disable Alpha Blend
         gl.glDisable(GL10.GL_TEXTURE_2D);             // Disable Texture Mapping
-
-        //mSquare.draw();     // Draws the square to the screen
-        draw(gl);
     }
 
+    @Override
     public void onSurfaceChanged(GL10 gl, int x, int y) {
         float fov_degrees = 45f;
         float fov_radians = fov_degrees / 180 * (float) Math.PI;
@@ -107,40 +95,6 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    @TargetApi(21)
-    public static int loadShader(int type, String shaderCode){
-
-        // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
-        // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-        int shader = GLES20.glCreateShader(type);
-
-        // add the source code to the shader and compile it
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-
-        return shader;
-    }
-
-    /**
-     * Override the draw function from ARRenderer.
-     */
-    @Override
-    public void draw(GL10 gl) {
-
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-
-        // Apply the ARToolKit projection matrix
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
-
-        gl.glEnable(GL10.GL_CULL_FACE);
-        gl.glShadeModel(GL10.GL_SMOOTH);
-        gl.glEnable(GL10.GL_DEPTH_TEST);
-        gl.glFrontFace(GL10.GL_CW);
-
-        cube.draw(gl);
     }
 
 }
