@@ -41,7 +41,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     private CUESensorService sensorService;
     private CUEDatabaseService databaseService;
 
-    private CUEGeoFence east;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,11 +56,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         this.cueRenderer = new CUERenderer(this);
         this.locationService = CUELocationService.getInstance(this);
         this.sensorService = CUESensorService.getInstance(this);
-
-        CUELocation eastNW = new CUELocation(40.598998, -75.509014);
-        CUELocation eastNE = new CUELocation(40.599246, -75.508083);
-        CUELocation eastSW = new CUELocation(40.598233, -75.508613);
-        this.east = new CUEGeoFence(eastNW, eastNE, eastSW);
 
     }
 
@@ -122,8 +116,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     @Override
     public void onLocationChanged(Location location) {
         Log.d("cuear", "received new location");
-        if(location != null && CUEGeoFence.isInsideBoundingBox(east.getCorners(), new CUELocation(location)))
-            cueRenderer.setText("Welcome to East!");
+        if(location != null)
+            cueRenderer.setText(location.toString());
         // check if camera is open
 
         // calculate field of view
