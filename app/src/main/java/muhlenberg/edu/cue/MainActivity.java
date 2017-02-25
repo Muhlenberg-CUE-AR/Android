@@ -19,7 +19,6 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
-import muhlenberg.edu.cue.services.CUEDatabaseService;
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
 import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
@@ -39,8 +38,10 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     private CUELocationService locationService;
     private CUESensorService sensorService;
-    private CUEDatabaseService databaseService;
 
+    private CUEGeoFence eastFence;
+    private CUEGeoFence moyerFence;
+    private CUEGeoFence ettingerFence;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,20 +53,35 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
-
-        this.cueRenderer = new CUERenderer(this);
-        this.locationService = CUELocationService.getInstance(this);
-        this.sensorService = CUESensorService.getInstance(this);
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        this.cueRenderer = new CUERenderer(this);
+        this.locationService = CUELocationService.getInstance(this);
+        this.sensorService = CUESensorService.getInstance(this);
+
+        CUELocation[] east = {new CUELocation(40.598865, -75.508924),
+                new CUELocation(40.599081, -75.508162),
+                new CUELocation(40.598283, -75.508586)};
+
+        CUELocation[] moyer = {new CUELocation(40.598091, -75.509107),
+                new CUELocation(40.598297, -75.508383),
+                new CUELocation(40.597533, -75.508823)};
+
+        CUELocation[] ettinger = {new CUELocation(40.597935, -75.509952),
+                new CUELocation(40.598092, -75.509112),
+                new CUELocation(40.597538, -75.509732)};
+
+
+        eastFence = new CUEGeoFence(east[0], east[1], east[2]);
+        moyerFence = new CUEGeoFence(moyer[0], moyer[1], moyer[2]);
+        ettingerFence = new CUEGeoFence(ettinger[0], ettinger[1], ettinger[2]);
+
         this.locationService.start(this);
         this.sensorService.start(this);
-
     }
 
     @Override
@@ -93,7 +109,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
      */
     @Override
     protected FrameLayout supplyFrameLayout() {
-        return (FrameLayout)this.findViewById(R.id.mainLayout);
+        return (FrameLayout) this.findViewById(R.id.mainLayout);
     }
 
     private boolean checkCameraPermission() {
@@ -116,8 +132,15 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     @Override
     public void onLocationChanged(Location location) {
         Log.d("cuear", "received new location");
-        if(location != null)
-            cueRenderer.setText(location.toString());
+        if (location != null && CUEGeoFence.isInsideBoundingBox(eastFence.getCorners(), new CUELocation(location)))
+            cueRenderer.setText("Welcome to East!");
+        else if (location != null && CUEGeoFence.isInsideBoundingBox(moyerFence.getCorners(), new CUELocation(location)))
+            cueRenderer.setText("Welcome to Moyer!");
+        else if (location != null && CUEGeoFence.isInsideBoundingBox(ettingerFence.getCorners(), new CUELocation(location)))
+            cueRenderer.setText("Welcome to Ettinger!");
+        else {
+            Log.d("cuear", "you done fucked up");
+        }
         // check if camera is open
 
         // calculate field of view

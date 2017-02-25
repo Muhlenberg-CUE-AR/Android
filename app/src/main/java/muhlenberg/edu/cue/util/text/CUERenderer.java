@@ -29,7 +29,7 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
     @Override
     public boolean configureARScene() {
         super.configureARScene();
-        ARToolKit.getInstance().addMarker("single;Data/patt.hiro;80");
+        ARToolKit.getInstance();
 
         return true;
     }

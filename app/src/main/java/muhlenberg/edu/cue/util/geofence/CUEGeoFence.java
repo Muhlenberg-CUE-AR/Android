@@ -126,13 +126,13 @@ public class CUEGeoFence {
      * @param corners
      * @param point
      * @return
-     */
-    public static boolean isInsideBoundingBox(CUELocation[] corners, CUELocation point) {
-        if (corners.length != 4 || corners[0] == null || corners[1] == null
-                || corners[2] == null || corners[3] == null || point == null) {
-            Log.d("cuear", "Null point or corners passed to isInsideBoundingBox() of CUEGeoFence! Is locationlistener ready to receive input?");
-            return false;
-        }
+        */
+        public static boolean isInsideBoundingBox(CUELocation[] corners, CUELocation point) {
+            if (corners.length != 4 || corners[0] == null || corners[1] == null
+                    || corners[2] == null || corners[3] == null || point == null) {
+                Log.d("cuear", "Null point or corners passed to isInsideBoundingBox() of CUEGeoFence! Is locationlistener ready to receive input?");
+                return false;
+            }
         double[] a = {corners[0].getLatitude(), corners[0].getLongitude()};
         double[] b = {corners[1].getLatitude(), corners[1].getLongitude()};
         double[] c = {corners[2].getLatitude(), corners[2].getLongitude()};
