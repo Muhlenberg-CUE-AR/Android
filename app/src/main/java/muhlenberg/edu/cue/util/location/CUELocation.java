@@ -58,4 +58,13 @@ public class CUELocation {
     public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
+
+
+    public double getLatitudeRadians() {
+        return lat*Math.PI/180.0;
+    }
+
+    public double getLongitudeRadians() {
+        return lng*Math.PI/180.0;
+    }
 }

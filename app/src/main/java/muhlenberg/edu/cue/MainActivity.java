@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -23,7 +24,8 @@ import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
 import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
 import muhlenberg.edu.cue.util.location.CUELocation;
-import muhlenberg.edu.cue.util.text.CUERenderer;
+import muhlenberg.edu.cue.util.location.CUELocationUtils;
+import muhlenberg.edu.cue.util.renderer.CUERenderer;
 
 /**
  * Created by Jalal on 1/28/2017.
@@ -42,6 +44,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     private CUEGeoFence eastFence;
     private CUEGeoFence moyerFence;
     private CUEGeoFence ettingerFence;
+    private float azimuthRadians;
+    private CUELocation eastCourtyard;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,12 +57,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
         this.cueRenderer = new CUERenderer(this);
         this.locationService = CUELocationService.getInstance(this);
         this.sensorService = CUESensorService.getInstance(this);
@@ -80,6 +78,13 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         moyerFence = new CUEGeoFence(moyer[0], moyer[1], moyer[2]);
         ettingerFence = new CUEGeoFence(ettinger[0], ettinger[1], ettinger[2]);
 
+        this.azimuthRadians = Float.MAX_VALUE;
+        this.eastCourtyard = new CUELocation(40.598932, -75.508470);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         this.locationService.start(this);
         this.sensorService.start(this);
     }
@@ -130,34 +135,57 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        Log.d("cuear", "received new location");
-        if (location != null && CUEGeoFence.isInsideBoundingBox(eastFence.getCorners(), new CUELocation(location)))
-            cueRenderer.setText("Welcome to East!");
-        else if (location != null && CUEGeoFence.isInsideBoundingBox(moyerFence.getCorners(), new CUELocation(location)))
-            cueRenderer.setText("Welcome to Moyer!");
-        else if (location != null && CUEGeoFence.isInsideBoundingBox(ettingerFence.getCorners(), new CUELocation(location)))
-            cueRenderer.setText("Welcome to Ettinger!");
-        else {
-            Log.d("cuear", "you done fucked up");
-        }
-        // check if camera is open
+    public void onLocationChanged(Location loc) {
+        if(loc == null)
+            return;
 
-        // calculate field of view
-        sensorService.calculateFieldOfView(this);
+        Log.d("cuear", "received new location");
+        CUELocation location = new CUELocation(loc);
+        if (CUEGeoFence.isInsideBoundingBox(eastFence.getCorners(), location)) {
+            Log.d("cuear", "location is within east");
+            if(azimuthRadians != Float.MAX_VALUE) {
+                Log.d("cuear", "azimuth is updated with a value of " + azimuthRadians);
+                double distance = CUELocationUtils.getDistance(location, eastCourtyard);
+                double angle = CUELocationUtils.getAngleAsDegrees(location, eastCourtyard) * Math.PI / 180.0;
+                double x = CUELocationUtils.getObjectScreenX(angle, azimuthRadians, distance);
+                double y = CUELocationUtils.getObjectScreenY(angle, azimuthRadians, distance);
+
+                int sx = (int) Math.floor(x);
+                int sy = (int) Math.floor(y);
+                cueRenderer.setText("Welcome to East! at " + sx + ", " + sy, sx, sy);
+            }
+            else {
+                cueRenderer.setText("azimuth: " + azimuthRadians, 0, 0);
+            }
+        }
+
     }
+    private float[] accel = null;
+    private float[] geomagentic = null;
 
     // when any sensor gets a new value this function is run
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float azimuthRadians = event.values[0];
-        Float azimuthDegrees = (azimuthRadians * 180) / (float) Math.PI;
-        Log.d("Azimuth", azimuthDegrees.toString());
+
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            accel = event.values;
+        if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            geomagentic = event.values;
+
+        if(accel != null && geomagentic != null) {
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, accel, geomagentic);
+            if(success) {
+                float[] orientation = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                azimuthRadians = orientation[0];
+            }
+        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        Log.d("Will", "Will is cooler than Jalal");
     }
 
 }
