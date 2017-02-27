@@ -58,4 +58,8 @@ public class CUELocation {
     public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
+
+    public String toString() {
+        return lat + "," + lng;
+    }
 }

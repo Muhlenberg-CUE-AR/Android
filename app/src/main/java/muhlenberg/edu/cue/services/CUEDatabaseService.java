@@ -49,16 +49,49 @@ public class CUEDatabaseService extends AbstractService {
         Used to enter in all POIs. Calling this function adds them all to the database.
      */
     public void createAllPOIs() {
+        // array of all of the buildings we plan on including
+        Building[] buildings = new Building[24];
 
-        /**
-         *  Format:
-         *  insertPOI( id, name, short desc, long desc, latitude, longitude, activation box coordinates 1-4);
-         */
+        // creates building objects to be stored in an array
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", 40.597450f, -75.510855f);
+        Trumbower.addActivationBoxCoordinate(new CUELocation(40.598091, -75.509107),
+                new CUELocation(40.598297, -75.508383),
+                new CUELocation(40.597533, -75.508823),
+                null);
+        buildings[0] = Trumbower;
+        Building Haas = new Building(1, "Hass", "Building", "College Offices", 40.597629f, -75.510136f);
+        buildings[1] = Haas;
+        Building New_Sci = new Building(2, "New Science", "Building", "New Science Building", 40.597207f, -75.511698f);
+        buildings[2] = New_Sci;
+        Building Ettinger = new Building(3, "Ettinger", "Building", "Business and History", 40.597804f, -75.509426f);
+        Ettinger.addActivationBoxCoordinate(new CUELocation(40.597935, -75.509952),
+                new CUELocation(40.598092, -75.509112),
+                new CUELocation(40.597538, -75.509732),
+                null);
+        buildings[3] = Ettinger;
+        Building Moyer = new Building(4, "Moyer", "Building", "Useless Majors", 40.597930f, -75.508640f);
+        buildings[4] = Moyer;
+        /*Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);
+        Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);*/
 
-        insertPOI("Trumbower", "Building", "Math and Science", 1, 1, "1.0, 1.0", "1.0, 1.0", "1.0, 1.0", "1.0, 1.0");
-        // insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
-        // insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
-        // insertPOI("test", "test", "test", 1, 1, 1, 1, 1, 1);
+        insertAllPOI(buildings);
 
     }
 
@@ -66,24 +99,32 @@ public class CUEDatabaseService extends AbstractService {
         Adds a row to the database. Uses the variable values to store each column in the row and
         then inserting it into the table.
      */
-    public long insertPOI(String name, String shortDesc, String longDesc, float latitude, float longitude,
-                          String activationBox1, String activationBox2, String activationBox3, String activationBox4) {
+    public long insertPOI(Building b) {
 
         ContentValues values = new ContentValues();
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME, name);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC, shortDesc);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC, longDesc);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE, latitude);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, longitude);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1, activationBox1);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2, activationBox2);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3, activationBox3);
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4, activationBox4);
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME, b.getName());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC, b.getShortDesc());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC, b.getLongDesc());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE, b.getLat());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, b.getLon());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1, b.getActivationBoxNE().toString());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2, b.getActivationBoxNW().toString());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3, b.getActivationBoxSE().toString());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4, b.getActivationBoxSW().toString());
 
         //Inserts the POI and returns the ID
         long newRowId = sql.insert(CUEDatabaseContract.FeedEntry.TABLE_NAME, null, values);
 
         return newRowId;
+    }
+
+    /*
+        Adds all points of interest to the database
+     */
+    public void insertAllPOI(Building[] buildings) {
+        for(int i=0; i<buildings.length; i++){
+            insertPOI(buildings[i]);
+        }
     }
 
     /*

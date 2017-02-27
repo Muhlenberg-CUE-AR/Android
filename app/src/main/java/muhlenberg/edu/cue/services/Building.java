@@ -12,29 +12,25 @@ import muhlenberg.edu.cue.util.location.CUELocation;
 
 public class Building {
     // information for each building
-    private int id;
+    private long id;
     private String name;
     private String shortDesc;
     private String longDesc;
     private Float lat;
-    private Float lon;
+    private Float lng;
     private CUELocation activationBoxNE;
     private CUELocation activationBoxNW;
     private CUELocation activationBoxSE;
     private CUELocation activationBoxSW;
 
-    public Building(int id, String name, String shortDesc, String longDesc, Float lat, Float lon){
+    public Building(long id, String name, String shortDesc, String longDesc, Float lat, Float lng){
         // sets all fields given through the constructor
         this.id = id;
         this.name = name;
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
         this.lat = lat;
-        this.lon = lon;
-        /*this.activationBoxNE = activationBoxNE;
-        this.activationBoxNW = activationBoxNW;
-        this.activationBoxSE = activationBoxSE;
-        this.activationBoxSW = activationBoxSW;*/
+        this.lng = lng;
     }
 
     // sets the lat, lng for the activation box
@@ -47,7 +43,7 @@ public class Building {
 
     // getter methods
     // no setters because the data will not change
-    public int getId() { return this.id; }
+    public long getId() { return this.id; }
 
     public String getName() { return this.name; }
 
@@ -57,6 +53,15 @@ public class Building {
 
     public Float getLat() { return this.lat; }
 
-    public Float getLon() { return this.lon; }
+    public Float getLon() { return this.lng; }
+
+    public CUELocation getActivationBoxNE() { return this.activationBoxNE; }
+
+    public CUELocation getActivationBoxNW() { return this.activationBoxNW; }
+
+    public CUELocation getActivationBoxSE() { return this.activationBoxSE; }
+
+    public CUELocation getActivationBoxSW() { return this.activationBoxSW; }
+
 
 }
