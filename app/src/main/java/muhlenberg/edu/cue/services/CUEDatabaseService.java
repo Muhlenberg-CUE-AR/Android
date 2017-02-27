@@ -186,6 +186,8 @@ public class CUEDatabaseService extends AbstractService {
         b1.addActivationBoxCoordinate(NE, NW, SE, SW);
 
         cursor.close();
+
+
         return b1;
     }
 

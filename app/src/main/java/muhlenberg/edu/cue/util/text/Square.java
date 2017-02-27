@@ -73,20 +73,20 @@ public class Square {
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
 
-        // creates shaders for the square
-        int vertexShader = CUERenderer.loadShader(GLES20.GL_VERTEX_SHADER,
-                vertexShaderCode);
-        int fragmentShader = CUERenderer.loadShader(GLES20.GL_FRAGMENT_SHADER,
-                fragmentShaderCode);
+//        // creates shaders for the square
+//        int vertexShader = CUERenderer.loadShader(GLES20.GL_VERTEX_SHADER,
+//                vertexShaderCode);
+//        int fragmentShader = CUERenderer.loadShader(GLES20.GL_FRAGMENT_SHADER,
+//                fragmentShaderCode);
 
         // create empty OpenGL ES Program
         mProgram = GLES20.glCreateProgram();
 
         // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, vertexShader);
-
-        // add the fragment shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader);
+//        GLES20.glAttachShader(mProgram, vertexShader);
+//
+//        // add the fragment shader to program
+//        GLES20.glAttachShader(mProgram, fragmentShader);
 
         // creates OpenGL ES program executables
         GLES20.glLinkProgram(mProgram);

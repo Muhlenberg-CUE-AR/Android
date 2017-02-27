@@ -31,8 +31,8 @@ public class CUELocation {
 
     public CUELocation(String coordinates) {
         String[] coords = coordinates.split(",");
-        this.lat = Float.parseFloat(coords[0]);
-        this.lng = Float.parseFloat(coords[1]);
+        this.lat = Float.parseFloat(coords[0].trim());
+        this.lng = Float.parseFloat(coords[1].trim());
     }
 
     public double getLatitude() {

@@ -8,6 +8,7 @@ import android.test.AndroidTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.runners.Suite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import muhlenberg.edu.cue.util.location.CUELocation;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
@@ -25,6 +27,7 @@ import static junit.framework.Assert.assertTrue;
  * Created by Jalal on 2/16/2017.
  */
 @RunWith(JUnit4.class)
+
 public class CUEGeoFenceTest {
     //correct coordinates of Muhlenberg campus
     CUELocation nw = new CUELocation(40.598346, -75.514447);
@@ -33,75 +36,40 @@ public class CUEGeoFenceTest {
     CUELocation se = new CUELocation(40.597343, -75.506840);
 
 
-//    @Test
-//    public void testConstructor() {
-//        CUELocation w = new CUELocation(0,0);
-//        CUELocation x = new CUELocation(0,0);
-//        CUELocation y = new CUELocation(0,0);
-//        CUELocation z = new CUELocation(0,0);
-//
-//        CUEGeoFence fence = new CUEGeoFence(w, x, y, z);
-//        assertEquals(w.getLatitude(), fence.getCorners()[0].getLatitude());
-//        assertEquals(x.getLatitude(), fence.getCorners()[1].getLatitude());
-//        assertEquals(y.getLatitude(), fence.getCorners()[2].getLatitude());
-//        assertEquals(z.getLatitude(), fence.getCorners()[3].getLatitude());
-//
-//        assertEquals(w.getLongitude(), fence.getCorners()[0].getLongitude());
-//        assertEquals(x.getLongitude(), fence.getCorners()[1].getLongitude());
-//        assertEquals(y.getLongitude(), fence.getCorners()[2].getLongitude());
-//        assertEquals(z.getLongitude(), fence.getCorners()[3].getLongitude());
-//
-//
-//        CUELocation[] arr = {w, x, y, z};
-//        CUEGeoFence fence2 = new CUEGeoFence(arr);
-//
-//        assertEquals(w.getLatitude(), fence2.getCorners()[0].getLatitude());
-//        assertEquals(x.getLatitude(), fence2.getCorners()[1].getLatitude());
-//        assertEquals(y.getLatitude(), fence2.getCorners()[2].getLatitude());
-//        assertEquals(z.getLatitude(), fence2.getCorners()[3].getLatitude());
-//
-//        assertEquals(w.getLongitude(), fence2.getCorners()[0].getLongitude());
-//        assertEquals(x.getLongitude(), fence2.getCorners()[1].getLongitude());
-//        assertEquals(y.getLongitude(), fence2.getCorners()[2].getLongitude());
-//        assertEquals(z.getLongitude(), fence2.getCorners()[3].getLongitude());
-//
-//        CUEGeoFence fence3 = new CUEGeoFence();
-//        assertEquals(4, fence3.getCorners().length);
-//        assertNull(fence3.getCorners()[0]);
-//        assertNull(fence3.getCorners()[1]);
-//        assertNull(fence3.getCorners()[2]);
-//        assertNull(fence3.getCorners()[3]);
-//    }
-//
-//
     @Test
     public void testValidate() {
-        CUELocation[] correctCorners = {nw, ne, sw, se};
-        CUEGeoFence correctFence = new CUEGeoFence(correctCorners);
+        CUELocation nw = new CUELocation(0, 1);
+        CUELocation ne = new CUELocation(1, 1);
+        CUELocation sw = new CUELocation(0, 0);
 
-        assertTrue(correctFence.validate(correctCorners, CUEGeoFence.VALIDATION_TOLERANCE));
+        assertTrue(CUEGeoFence.validate(nw, ne, sw));
 
-        CUELocation[] incorrectCorners = {sw, nw, se, new CUELocation(0,0)};
-        CUEGeoFence incorrectFence = new CUEGeoFence(incorrectCorners);
-        assertFalse(incorrectFence.validate(incorrectCorners, CUEGeoFence.VALIDATION_TOLERANCE));
+        CUELocation bad = new CUELocation(10, 10);
+        assertFalse(CUEGeoFence.validate(nw, sw, bad));
+
+        assertTrue(CUEGeoFence.validate(this.nw, this.ne, this.sw));
+
+
+        CUELocation eastNW = new CUELocation(40.598998, -75.509014);
+        CUELocation eastNE = new CUELocation(40.599246, -75.508083);
+        CUELocation eastSW = new CUELocation(40.598233, -75.508613);
+
+        assertTrue(CUEGeoFence.validate(eastNW, eastNE, eastSW));
 
     }
-//
-//    @Test
-//    public void testInsideBoundingBox() {
-//        CUELocation validInside = new CUELocation(40.597571, -75.510402);
-//        CUELocation[] corners = {nw, ne, sw, se};
-//        CUEGeoFence fence = new CUEGeoFence(corners);
-//        assertTrue(fence.isInsideBoundingBox(corners, validInside));
-//
-//        CUELocation invalidInside = new CUELocation(0,0);
-//        assertFalse(fence.isInsideBoundingBox(corners, invalidInside));
-//
-//        CUELocation[] nullCorners = new CUELocation[4];
-//        CUEGeoFence invalidFence = new CUEGeoFence(nullCorners);
-//        assertFalse(invalidFence.isInsideBoundingBox(nullCorners, invalidInside));
-//    }
 
+    @Test
+    public void testInsideBoundingBox() {
+        CUELocation validInside = new CUELocation(40.597571, -75.510402);
+        CUELocation[] corners = {nw, ne, sw, se};
+        assertTrue(CUEGeoFence.isInsideBoundingBox(corners, validInside));
+        CUELocation invalidInside = new CUELocation(0,0);
+        assertFalse(CUEGeoFence.isInsideBoundingBox(corners, invalidInside));
+
+        CUELocation[] nullCorners = new CUELocation[4];
+        assertFalse(CUEGeoFence.isInsideBoundingBox(nullCorners, invalidInside));
+
+    }
 
     @Test
     public void testCaclulateFourthCorner() {

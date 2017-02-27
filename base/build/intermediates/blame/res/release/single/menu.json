@@ -1,9 +1,5 @@
 [
     {
-        "merged": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\build\\intermediates\\res\\merged\\release\\menu\\options.xml",
-        "source": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\src\\main\\res\\menu\\options.xml"
-    },
-    {
         "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\release\\menu\\options.xml",
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\src\\main\\res\\menu\\options.xml"
     }
