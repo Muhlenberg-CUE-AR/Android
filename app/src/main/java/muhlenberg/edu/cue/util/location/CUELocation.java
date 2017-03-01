@@ -67,4 +67,8 @@ public class CUELocation {
     public double getLongitudeRadians() {
         return lng*Math.PI/180.0;
     }
+
+    public String toString() {
+        return lat + "," + lng;
+    }
 }
