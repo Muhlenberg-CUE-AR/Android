@@ -44,8 +44,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     private CUEGeoFence eastFence;
     private CUEGeoFence moyerFence;
     private CUEGeoFence ettingerFence;
-    private float azimuthRadians;
     private CUELocation eastCourtyard;
+    private CUELocation lastKnownPosition;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         moyerFence = new CUEGeoFence(moyer[0], moyer[1], moyer[2]);
         ettingerFence = new CUEGeoFence(ettinger[0], ettinger[1], ettinger[2]);
 
-        this.azimuthRadians = Float.MAX_VALUE;
         this.eastCourtyard = new CUELocation(40.598932, -75.508470);
     }
 
@@ -136,30 +135,13 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     @Override
     public void onLocationChanged(Location loc) {
-        if(loc == null)
+        if (loc == null)
             return;
 
-        Log.d("cuear", "received new location");
-        CUELocation location = new CUELocation(loc);
-        if (CUEGeoFence.isInsideBoundingBox(eastFence.getCorners(), location)) {
-            Log.d("cuear", "location is within east");
-            if(azimuthRadians != Float.MAX_VALUE) {
-                Log.d("cuear", "azimuth is updated with a value of " + azimuthRadians);
-                double distance = CUELocationUtils.getDistance(location, eastCourtyard);
-                double angle = CUELocationUtils.getAngleAsDegrees(location, eastCourtyard) * Math.PI / 180.0;
-                double x = CUELocationUtils.getObjectScreenX(angle, azimuthRadians, distance);
-                double y = CUELocationUtils.getObjectScreenY(angle, azimuthRadians, distance);
-
-                int sx = (int) Math.floor(x);
-                int sy = (int) Math.floor(y);
-                cueRenderer.setText("Welcome to East! at " + sx + ", " + sy, sx, sy);
-            }
-            else {
-                cueRenderer.setText("azimuth: " + azimuthRadians, 0, 0);
-            }
-        }
+        this.lastKnownPosition = new CUELocation(loc);
 
     }
+
     private float[] accel = null;
     private float[] geomagentic = null;
 
@@ -167,19 +149,33 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-            accel = event.values;
-        if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-            geomagentic = event.values;
+        if (lastKnownPosition == null || accel == null || geomagentic == null)
+            return;
 
-        if(accel != null && geomagentic != null) {
-            float R[] = new float[9];
-            float I[] = new float[9];
-            boolean success = SensorManager.getRotationMatrix(R, I, accel, geomagentic);
-            if(success) {
-                float[] orientation = new float[3];
-                SensorManager.getOrientation(R, orientation);
-                azimuthRadians = orientation[0];
+        if (CUEGeoFence.shouldActivate(lastKnownPosition)) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+                accel = event.values;
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+                geomagentic = event.values;
+
+            if (accel != null && geomagentic != null) {
+                float R[] = new float[9];
+                float I[] = new float[9];
+                boolean success = SensorManager.getRotationMatrix(R, I, accel, geomagentic);
+                if (success) {
+                    float[] orientation = new float[3];
+                    SensorManager.getOrientation(R, orientation);
+                    float azimuthRadians = orientation[0];
+
+                    double distance = CUELocationUtils.getDistance(lastKnownPosition, eastCourtyard);
+                    double angle = CUELocationUtils.getAngleAsDegrees(lastKnownPosition, eastCourtyard) * Math.PI / 180.0;
+                    double x = CUELocationUtils.getObjectScreenX(angle, azimuthRadians, distance);
+                    double y = CUELocationUtils.getObjectScreenY(angle, azimuthRadians, distance);
+
+                    int sx = (int) Math.floor(x);
+                    int sy = (int) Math.floor(y);
+                    cueRenderer.setText("Welcome to East!", sx, sy);
+                }
             }
         }
     }

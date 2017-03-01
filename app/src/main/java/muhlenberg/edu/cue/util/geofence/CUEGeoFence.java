@@ -154,6 +154,16 @@ public class CUEGeoFence {
         return false;
     }
 
+    /**
+     * TODO: come up with a fast way to calculate if we are inside any bounding box
+     * @param location
+     * @return
+     */
+    public static boolean shouldActivate(CUELocation location) {
+
+        return true;
+    }
+
     public CUELocation[] getCorners() {
         return this.corners;
     }
