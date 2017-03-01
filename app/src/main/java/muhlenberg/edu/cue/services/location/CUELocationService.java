@@ -19,6 +19,9 @@ import muhlenberg.edu.cue.services.AbstractService;
 
 /**
  * Created by Jalal on 1/28/2017.
+ *
+ * 2/28/17
+ * TODO: figure out how to not need context twice without a field instance
  */
 public class CUELocationService extends AbstractService {
 
@@ -135,14 +138,5 @@ public class CUELocationService extends AbstractService {
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
         return locationRequest;
-    }
-
-    /**
-     * Checks to see if Google API Client is connected or connecting
-     * Determines the state of this service
-     * @return
-     */
-    public boolean isStarted() {
-        return googleApiClient.isConnected() || googleApiClient.isConnecting();
     }
 }
