@@ -1,4 +1,4 @@
-package muhlenberg.edu.cue.services;
+package muhlenberg.edu.cue.services.database;
 
 /**
  * Created by jason on 2/7/17.
@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
 
+import muhlenberg.edu.cue.services.AbstractService;
 import muhlenberg.edu.cue.util.location.CUELocation;
 
 import static muhlenberg.edu.cue.ARSimpleApplication.getContext;

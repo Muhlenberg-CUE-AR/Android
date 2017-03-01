@@ -1,4 +1,4 @@
-package muhlenberg.edu.cue.services;
+package muhlenberg.edu.cue.services.location;
 
 import android.Manifest;
 import android.content.Context;
@@ -11,11 +11,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import muhlenberg.edu.cue.MainActivity;
+import muhlenberg.edu.cue.services.AbstractService;
 
 /**
  * Created by Jalal on 1/28/2017.

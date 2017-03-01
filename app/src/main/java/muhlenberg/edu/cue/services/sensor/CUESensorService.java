@@ -1,12 +1,11 @@
-package muhlenberg.edu.cue.services;
+package muhlenberg.edu.cue.services.sensor;
 
 import android.content.Context;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import muhlenberg.edu.cue.MainActivity;
+import muhlenberg.edu.cue.services.AbstractService;
 
 /**
  * Created by Will on 2/7/2017.

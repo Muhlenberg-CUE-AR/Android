@@ -10,7 +10,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -20,8 +19,8 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
-import muhlenberg.edu.cue.services.CUELocationService;
-import muhlenberg.edu.cue.services.CUESensorService;
+import muhlenberg.edu.cue.services.location.CUELocationService;
+import muhlenberg.edu.cue.services.sensor.CUESensorService;
 import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
 import muhlenberg.edu.cue.util.location.CUELocation;
 import muhlenberg.edu.cue.util.location.CUELocationUtils;
@@ -149,33 +148,32 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     @Override
     public void onSensorChanged(SensorEvent event) {
 
+
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            accel = event.values;
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            geomagentic = event.values;
+
         if (lastKnownPosition == null || accel == null || geomagentic == null)
             return;
 
         if (CUEGeoFence.shouldActivate(lastKnownPosition)) {
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-                accel = event.values;
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-                geomagentic = event.values;
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, accel, geomagentic);
+            if (success) {
+                float[] orientation = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                float azimuthRadians = orientation[0];
 
-            if (accel != null && geomagentic != null) {
-                float R[] = new float[9];
-                float I[] = new float[9];
-                boolean success = SensorManager.getRotationMatrix(R, I, accel, geomagentic);
-                if (success) {
-                    float[] orientation = new float[3];
-                    SensorManager.getOrientation(R, orientation);
-                    float azimuthRadians = orientation[0];
+                double distance = CUELocationUtils.getDistance(lastKnownPosition, eastCourtyard);
+                double angle = CUELocationUtils.getAngleAsDegrees(lastKnownPosition, eastCourtyard) * Math.PI / 180.0;
+                double x = CUELocationUtils.getObjectScreenX(angle, azimuthRadians, distance);
+                double y = CUELocationUtils.getObjectScreenY(angle, azimuthRadians, distance);
 
-                    double distance = CUELocationUtils.getDistance(lastKnownPosition, eastCourtyard);
-                    double angle = CUELocationUtils.getAngleAsDegrees(lastKnownPosition, eastCourtyard) * Math.PI / 180.0;
-                    double x = CUELocationUtils.getObjectScreenX(angle, azimuthRadians, distance);
-                    double y = CUELocationUtils.getObjectScreenY(angle, azimuthRadians, distance);
-
-                    int sx = (int) Math.floor(x);
-                    int sy = (int) Math.floor(y);
-                    cueRenderer.setText("Welcome to East!", sx, sy);
-                }
+                int sx = (int) Math.floor(x);
+                int sy = (int) Math.floor(y);
+                cueRenderer.setText("Welcome to East!", sx, sy);
             }
         }
     }
