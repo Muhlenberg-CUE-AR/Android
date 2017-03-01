@@ -27,8 +27,8 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_NAME_NAME + " TEXT," +
                     COLUMN_NAME_SHORT_DESC + " TEXT," +
                     COLUMN_NAME_LONG_DESC + " TEXT," +
-                    COLUMN_NAME_LATITUDE + " NUM," +
-                    COLUMN_NAME_LONGITUDE + " NUM," +
+                    COLUMN_NAME_LATITUDE + " REAL," +
+                    COLUMN_NAME_LONGITUDE + " REAL," +
                     COLUMN_NAME_ACTIVATION_BOX1 + " TEXT," +
                     COLUMN_NAME_ACTIVATION_BOX2 + " TEXT," +
                     COLUMN_NAME_ACTIVATION_BOX3 + " TEXT," +

@@ -1,5 +1,9 @@
 [
     {
+        "merged": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\settings.png",
+        "source": "C:\\Users\\shielwill\\Development\\CUE\\Android\\base\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\settings.png"
+    },
+    {
         "merged": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\settings.png",
         "source": "C:\\Users\\Jalal\\AndroidStudioProjects\\CUE\\base\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\settings.png"
     }

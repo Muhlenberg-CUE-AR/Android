@@ -2,6 +2,7 @@ package muhlenberg.edu.cue;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,6 +20,8 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import muhlenberg.edu.cue.services.CUEDatabaseHelper;
+import muhlenberg.edu.cue.services.CUEDatabaseService;
 import muhlenberg.edu.cue.services.CUELocationService;
 import muhlenberg.edu.cue.services.CUESensorService;
 import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
@@ -38,6 +41,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     private CUELocationService locationService;
     private CUESensorService sensorService;
+    private CUEDatabaseService databaseService;
 
     private CUEGeoFence eastFence;
     private CUEGeoFence moyerFence;
@@ -53,6 +57,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
+        this.databaseService = CUEDatabaseService.getInstance(this);
+        databaseService.createAllPOIs();
     }
 
     @Override

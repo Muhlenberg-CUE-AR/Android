@@ -2,12 +2,14 @@ package muhlenberg.edu.cue.services;
 
 /**
  * Created by jason on 2/7/17.
+ * added writes and reads in the db - Willy - 3/1/2017
  */
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
+import android.util.Log;
 
 import muhlenberg.edu.cue.util.location.CUELocation;
 
@@ -17,7 +19,7 @@ public class CUEDatabaseService extends AbstractService {
 
     private static CUEDatabaseService instance;
     private SQLiteDatabase sql;
-    private CUEDatabaseHelper mDbHelper;
+    public CUEDatabaseHelper mDbHelper;
 
     // Constants for retrieving information from the database
     public final static int ID = 0;
@@ -32,17 +34,17 @@ public class CUEDatabaseService extends AbstractService {
     public final static int ACTIVATION_BOX_SW = 9;
 
     // Creates an instance of the database
-    public CUEDatabaseService getInstance() {
+    public static CUEDatabaseService getInstance(Context context) {
         if (instance == null) {
-            instance = new CUEDatabaseService();
+            instance = new CUEDatabaseService(context);
         }
-
         return instance;
     }
 
     // Unused constructor
-    public CUEDatabaseService() {
-
+    public CUEDatabaseService(Context context) {
+        // instantiates the db
+        this.mDbHelper = new CUEDatabaseHelper(context);
     }
 
     /*
@@ -50,7 +52,7 @@ public class CUEDatabaseService extends AbstractService {
      */
     public void createAllPOIs() {
         // array of all of the buildings we plan on including
-        Building[] buildings = new Building[24];
+        Building[] buildings = new Building[5];
 
         // creates building objects to be stored in an array
         Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", 40.597450f, -75.510855f);
@@ -92,28 +94,36 @@ public class CUEDatabaseService extends AbstractService {
         Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", -40.59f, -75.51f);*/
 
         insertAllPOI(buildings);
-
     }
 
     /*
         Adds a row to the database. Uses the variable values to store each column in the row and
         then inserting it into the table.
      */
-    public long insertPOI(Building b) {
+    public long insertPOI(Building b, SQLiteDatabase db) {
 
         ContentValues values = new ContentValues();
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME, b.getName());
+        Log.d("Name", b.getName());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC, b.getShortDesc());
+        Log.d("ShortDesc", b.getShortDesc());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC, b.getLongDesc());
+        Log.d("LongDesc", b.getLongDesc());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE, b.getLat());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, b.getLon());
+        Log.d("Lat", b.getLat().toString());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, b.getLng());
+        Log.d("Lng", b.getLng().toString());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1, b.getActivationBoxNE().toString());
+        Log.d("ACNE", b.getActivationBoxNE().toString());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2, b.getActivationBoxNW().toString());
+        Log.d("ACNW", b.getActivationBoxNW().toString());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3, b.getActivationBoxSE().toString());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4, b.getActivationBoxSW().toString());
+        Log.d("ACSE", b.getActivationBoxSE().toString());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4, "Test String");
+        //Log.d("ACSW", b.getActivationBoxSW().toString());
 
         //Inserts the POI and returns the ID
-        long newRowId = sql.insert(CUEDatabaseContract.FeedEntry.TABLE_NAME, null, values);
+        long newRowId = db.insert(CUEDatabaseContract.FeedEntry.TABLE_NAME, null, values);
 
         return newRowId;
     }
@@ -122,8 +132,14 @@ public class CUEDatabaseService extends AbstractService {
         Adds all points of interest to the database
      */
     public void insertAllPOI(Building[] buildings) {
+        //list of building Id's
+        long[] idArray = new long[5];
+
+        // opens the database
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // adds new entry for each building we have
         for(int i=0; i<buildings.length; i++){
-            insertPOI(buildings[i]);
+            idArray[i] = insertPOI(buildings[i], db);
         }
     }
 
