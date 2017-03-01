@@ -1,4 +1,4 @@
-package muhlenberg.edu.cue.services;
+package muhlenberg.edu.cue.services.database;
 
 import android.graphics.Point;
 import android.util.Log;

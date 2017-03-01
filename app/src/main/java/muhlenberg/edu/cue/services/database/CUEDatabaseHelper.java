@@ -1,20 +1,20 @@
-package muhlenberg.edu.cue.services;
+package muhlenberg.edu.cue.services.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
-import static muhlenberg.edu.cue.services.CUEDatabaseContract.FeedEntry.TABLE_NAME;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
+import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.TABLE_NAME;
 
 public class CUEDatabaseHelper extends SQLiteOpenHelper {
     /*

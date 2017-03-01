@@ -1,11 +1,13 @@
 // This is based on the OpenGL ES 1.0 sample application from the Android Developer website:
 // http://developer.android.com/resources/tutorials/opengl/opengl-es10.html
 
-package muhlenberg.edu.cue.util.text;
+package muhlenberg.edu.cue.util.renderer;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.opengl.Matrix;
+import android.util.Log;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
@@ -13,17 +15,22 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import muhlenberg.edu.cue.util.text.GLText;
+
 public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
     private GLText glText;
     private Context context;
 
     private String text;
+    private int textX, textY;
 
     public CUERenderer(Context context) {
         super();
         this.context = context;
-        this.text = "Hello world";
+        this.text = "Hello World";
+        this.textX = 0;
+        this.textY = 0;
     }
 
     @Override
@@ -41,7 +48,6 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
         // Create Font (Height: 14 Pixels / X+Y Padding 2 Pixels)
         glText.load("Roboto-Regular.ttf", 14, 2, 2);
-
     }
 
     @Override
@@ -60,7 +66,7 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);  // Set Alpha Blend Function
 
         glText.begin(1.0f, 1.0f, 1.0f, 1.0f);         // Begin Text Rendering (Set Color WHITE)
-        glText.draw(this.text, 0, 0, 0);
+        glText.draw(this.text, this.textX, this.textY, 0);
         glText.end();
 
         gl.glDisable(GL10.GL_BLEND);                  // Disable Alpha Blend
@@ -82,6 +88,7 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadIdentity();
 
+
         // calculate aspect ratio
         GLU.gluPerspective(gl, fov_degrees, aspect, camZ / 10, camZ * 10);
 
@@ -93,8 +100,12 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();
     }
 
-    public void setText(String text) {
+    public void setText(String text, int x, int y) {
         this.text = text;
+        this.textX = x;
+        this.textY = y;
+
+        Log.d("cuear_renderer", "set text to " + this.text + " at " + x + " , " + y);
     }
 
 }
