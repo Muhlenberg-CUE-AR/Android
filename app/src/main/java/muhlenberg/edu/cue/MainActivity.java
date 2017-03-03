@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import muhlenberg.edu.cue.services.sensor.CUESensorService;
 import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
 import muhlenberg.edu.cue.util.location.CUELocation;
 import muhlenberg.edu.cue.util.location.CUELocationUtils;
+import muhlenberg.edu.cue.util.renderer.CUERenderer;
 
 /**
  * Created by Jalal on 1/28/2017.
@@ -51,7 +53,6 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
-        this.sensorService = CUESensorService.getInstance(this);
 
         CUELocation[] east = {new CUELocation(40.598865, -75.508924),
                 new CUELocation(40.599081, -75.508162),
@@ -77,15 +78,15 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     public void onResume() {
         super.onResume();
         CUELocationService.getInstance(this).start(this);
-        this.sensorService.start(this);
-        CUERendererService.getInstance().start(this);
+        CUESensorService.getInstance().start(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         CUELocationService.getInstance(this).stop(this);
-        this.sensorService.stop(this);
+        CUERendererService.getInstance().stop(this);
+        CUESensorService.getInstance().stop(this);
     }
 
     /**
@@ -95,9 +96,13 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     protected ARRenderer supplyRenderer() {
         if (!checkCameraPermission()) {
             Toast.makeText(this, "No camera permission - restart the app", Toast.LENGTH_LONG).show();
+            Log.d("cuear", "supply renderer - permission check failed");
+            Log.d("ARActivity", "supply renderer - permission check failed");
             return null;
         }
 
+        if(CUERendererService.getInstance().getRenderer() == null)
+            CUERendererService.getInstance().setRenderer(new CUERenderer(this));
         return CUERendererService.getInstance().getRenderer();
     }
 
@@ -141,6 +146,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     // when any sensor gets a new value this function is run
     @Override
     public void onSensorChanged(SensorEvent event) {
+        Log.d("cuear", "sensor changed!");
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             accel = event.values;
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
@@ -165,7 +171,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
                 int sx = (int) Math.floor(x);
                 int sy = (int) Math.floor(y);
-                CUERendererService.getInstance().getRenderer().setText("Welcome to East!", sx, sy);
+                if(getCameraPreview() != null)
+                    CUERendererService.getInstance().getRenderer().setText("Welcome to East!", sx, sy);
             }
         }
     }

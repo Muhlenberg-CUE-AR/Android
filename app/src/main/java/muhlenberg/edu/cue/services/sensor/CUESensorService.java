@@ -18,23 +18,21 @@ public class CUESensorService extends AbstractService {
     Sensor mMagnetometer;
     Sensor mAccelerometer;
 
-    private CUESensorService(Context context){
-        mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-    }
-
-    public static CUESensorService getInstance(Context context) {
+    public static CUESensorService getInstance() {
         if (instance == null)
-            instance = new CUESensorService(context);
+            instance = new CUESensorService();
 
         return instance;
     }
 
     @Override
     public void start(Context context) {
-        mSensorManager.registerListener((MainActivity) context, mMagnetometer, SensorManager.SENSOR_DELAY_FASTEST);
-        mSensorManager.registerListener((MainActivity) context, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        mSensorManager.registerListener((MainActivity) context, mMagnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener((MainActivity) context, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override

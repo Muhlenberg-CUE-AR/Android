@@ -17,7 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import muhlenberg.edu.cue.util.text.GLText;
 
-public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
+public class CUERenderer extends ARRenderer {
 
     private GLText glText;
     private Context context;
@@ -36,7 +36,7 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
     @Override
     public boolean configureARScene() {
         super.configureARScene();
-        ARToolKit.getInstance();
+        ARToolKit.getInstance().addMarker("single;Data/patt.hiro;80");
 
         return true;
     }
@@ -48,6 +48,8 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
 
         // Create Font (Height: 14 Pixels / X+Y Padding 2 Pixels)
         glText.load("Roboto-Regular.ttf", 14, 2, 2);
+
+        Log.d("cuear", "gl surface created");
     }
 
     @Override
@@ -104,8 +106,6 @@ public class CUERenderer extends ARRenderer implements GLSurfaceView.Renderer {
         this.text = text;
         this.textX = x;
         this.textY = y;
-
-        Log.d("cuear_renderer", "set text to " + this.text + " at " + x + " , " + y);
     }
 
 }

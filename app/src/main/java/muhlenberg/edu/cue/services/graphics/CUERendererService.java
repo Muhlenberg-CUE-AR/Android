@@ -15,7 +15,7 @@ public class CUERendererService extends AbstractService {
     private CUERenderer cueRenderer;
 
     public static CUERendererService getInstance() {
-        if(instance == null)
+        if (instance == null)
             instance = new CUERendererService();
 
         return instance;
@@ -34,5 +34,9 @@ public class CUERendererService extends AbstractService {
 
     public CUERenderer getRenderer() {
         return this.cueRenderer;
+    }
+
+    public void setRenderer(CUERenderer renderer) {
+        this.cueRenderer = renderer;
     }
 }
