@@ -46,6 +46,7 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -61,6 +62,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.view.Window;
 import android.view.WindowManager;
@@ -216,7 +218,7 @@ public abstract class ARActivity extends Activity implements CameraEventListener
     	Log.i(TAG, "CaptureCameraPreview created"); 
     	
     	// Create the GL view
-    	glView = new GLSurfaceView(this);    		
+    	glView = new GLSurfaceView(this);
 		glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 		glView.getHolder().setFormat(PixelFormat.TRANSLUCENT); // Needs to be a translucent surface so the camera preview shows through.
 		glView.setRenderer(renderer);		
@@ -409,23 +411,22 @@ public abstract class ARActivity extends Activity implements CameraEventListener
 	}	
 
 	protected void showInfo() {
-    	
+
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-		
+
 		dialogBuilder.setMessage("ARToolKit Version: " + NativeInterface.arwGetARToolKitVersion());
-		
+
 		dialogBuilder.setCancelable(false);
 		dialogBuilder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
 			}
 		});
-		
+
 		AlertDialog alert = dialogBuilder.create();
 		alert.setTitle("ARToolKit");
 		alert.show();
-    	
-		
-    }
-    
+
+	}
+
 }

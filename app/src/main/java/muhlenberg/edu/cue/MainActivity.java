@@ -7,10 +7,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -27,9 +31,11 @@ import muhlenberg.edu.cue.services.sensor.CUESensorService;
 import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
 import muhlenberg.edu.cue.util.location.CUELocation;
 import muhlenberg.edu.cue.util.location.CUELocationUtils;
+import muhlenberg.edu.cue.util.renderer.CUERenderer;
 
 /**
  * Created by Jalal on 1/28/2017.
+ * Willy has also contributed to this file
  */
 public class MainActivity extends ARActivity implements LocationListener, SensorEventListener, CameraEventListener {
 
@@ -37,6 +43,7 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
 
     private CUESensorService sensorService;
     private CUEDatabaseService databaseService;
+    private FrameLayout mainLayout;
 
     private CUEGeoFence eastFence;
     private CUEGeoFence moyerFence;
@@ -49,6 +56,8 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mainLayout = (FrameLayout)this.findViewById(R.id.mainLayout);
+
         if (!checkCameraPermission()) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
@@ -56,6 +65,21 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         }
         this.databaseService = CUEDatabaseService.getInstance(this);
         databaseService.createAllPOIs();
+
+    }
+
+    // method to handle when the screen is touched
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        // and action code that tells the type of event
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            // toast to display the part of the screen being touched
+            String text = "You click at x = " + event.getX() + " and y = " + event.getY();
+            Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        }
+
+        return super.onTouchEvent(event);
     }
 
     /* commented out to preserve coordinates
@@ -89,15 +113,17 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
     public void onResume() {
         super.onResume();
         CUELocationService.getInstance(this).start(this);
-        this.sensorService.start(this);
+        CUESensorService.getInstance(this).start(this);
         CUERendererService.getInstance().start(this);
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
         CUELocationService.getInstance(this).stop(this);
-        this.sensorService.stop(this);
+        CUESensorService.getInstance(this).stop(this);
+        CUERendererService.getInstance().stop(this);
     }
 
     /**

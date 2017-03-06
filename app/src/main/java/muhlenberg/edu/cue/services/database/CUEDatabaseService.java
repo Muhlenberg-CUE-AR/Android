@@ -53,7 +53,7 @@ public class CUEDatabaseService extends AbstractService {
      */
     public void createAllPOIs() {
         // array of all of the buildings we plan on including
-        Building[] buildings = new Building[5];
+        Building[] buildings = new Building[1];
 
         // creates building objects to be stored in an array
         Building Trumbower = new Building(0, "Trumbower", "Building", "Math and Science", 40.597450f, -75.510855f);
@@ -62,7 +62,7 @@ public class CUEDatabaseService extends AbstractService {
                 new CUELocation(40.597533, -75.508823),
                 null);
         buildings[0] = Trumbower;
-        Building Haas = new Building(1, "Hass", "Building", "College Offices", 40.597629f, -75.510136f);
+        /*Building Haas = new Building(1, "Hass", "Building", "College Offices", 40.597629f, -75.510136f);
         buildings[1] = Haas;
         Building New_Sci = new Building(2, "New Science", "Building", "New Science Building", 40.597207f, -75.511698f);
         buildings[2] = New_Sci;

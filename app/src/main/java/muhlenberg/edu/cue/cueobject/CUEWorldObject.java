@@ -1,6 +1,6 @@
 package muhlenberg.edu.cue.cueobject;
 
-import muhlenberg.edu.cue.services.CUELocationService;
+import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.location.CUELocation;
 
 /**
