@@ -2,46 +2,47 @@ package muhlenberg.edu.cue;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.widget.FrameLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.beyondar.android.fragment.BeyondarFragmentSupport;
+import com.beyondar.android.opengl.renderable.SquareRenderable;
+import com.beyondar.android.util.math.geom.Point3;
+import com.beyondar.android.view.BeyondarGLSurfaceView;
+import com.beyondar.android.view.OnTouchBeyondarViewListener;
+import com.beyondar.android.world.BeyondarObject;
+import com.beyondar.android.world.GeoObject;
+import com.beyondar.android.world.World;
 import com.google.android.gms.location.LocationListener;
 
-import org.artoolkit.ar.base.ARActivity;
-import org.artoolkit.ar.base.camera.CameraEventListener;
-import org.artoolkit.ar.base.rendering.ARRenderer;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import muhlenberg.edu.cue.services.graphics.CUERendererService;
 import muhlenberg.edu.cue.services.location.CUELocationService;
-import muhlenberg.edu.cue.services.sensor.CUESensorService;
-import muhlenberg.edu.cue.util.geofence.CUEGeoFence;
-import muhlenberg.edu.cue.util.location.CUELocation;
-import muhlenberg.edu.cue.util.location.CUELocationUtils;
-import muhlenberg.edu.cue.util.renderer.CUERenderer;
 
 /**
  * Created by Jalal on 1/28/2017.
  */
-public class MainActivity extends ARActivity implements LocationListener, SensorEventListener, CameraEventListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, OnTouchBeyondarViewListener {
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 133;
 
-    private CUESensorService sensorService;
 
-    private CUEGeoFence eastFence;
-    private CUEGeoFence moyerFence;
-    private CUEGeoFence ettingerFence;
-    private CUELocation eastCourtyard;
-    private CUELocation lastKnownPosition;
+    private BeyondarFragmentSupport mBeyondarFragment;
+    private World world;
+
+    private Point3 roadEnd = new Point3(40.550939f, -75.401617f, 0.0f);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,64 +55,39 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
 
-        CUELocation[] east = {new CUELocation(40.598865, -75.508924),
-                new CUELocation(40.599081, -75.508162),
-                new CUELocation(40.598283, -75.508586)};
+        mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(R.id.beyondarFragment);
+        this.world = new World(this);
+        this.world.setGeoPosition(40.550616, -75.402740);
 
-        CUELocation[] moyer = {new CUELocation(40.598091, -75.509107),
-                new CUELocation(40.598297, -75.508383),
-                new CUELocation(40.597533, -75.508823)};
-
-        CUELocation[] ettinger = {new CUELocation(40.597935, -75.509952),
-                new CUELocation(40.598092, -75.509112),
-                new CUELocation(40.597538, -75.509732)};
+        GeoObject frontDoor = new GeoObject(1l);
+        frontDoor.setImageResource(R.drawable.home_text);
+        frontDoor.setGeoPosition(40.550699, -75.402833);
+        frontDoor.setName("Home");
 
 
-        eastFence = new CUEGeoFence(east[0], east[1], east[2]);
-        moyerFence = new CUEGeoFence(moyer[0], moyer[1], moyer[2]);
-        ettingerFence = new CUEGeoFence(ettinger[0], ettinger[1], ettinger[2]);
+        GeoObject road = new GeoObject(2l);
+        road.setGeoPosition(40.550781f, -75.403289f);
+        road.setImageResource(R.drawable.road_overlay);
+        road.setName("Road");
 
-        this.eastCourtyard = new CUELocation(40.598932, -75.508470);
+        this.world.addBeyondarObject(frontDoor);
+        this.world.addBeyondarObject(road);
+
+        mBeyondarFragment.setWorld(this.world);
+        mBeyondarFragment.setOnTouchBeyondarViewListener(this);
+        mBeyondarFragment.setMaxDistanceToRender(500);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         CUELocationService.getInstance(this).start(this);
-        CUESensorService.getInstance().start(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         CUELocationService.getInstance(this).stop(this);
-        CUERendererService.getInstance().stop(this);
-        CUESensorService.getInstance().stop(this);
-    }
-
-    /**
-     * Provide our own Renderer.
-     */
-    @Override
-    protected ARRenderer supplyRenderer() {
-        if (!checkCameraPermission()) {
-            Toast.makeText(this, "No camera permission - restart the app", Toast.LENGTH_LONG).show();
-            Log.d("cuear", "supply renderer - permission check failed");
-            Log.d("ARActivity", "supply renderer - permission check failed");
-            return null;
-        }
-
-        if(CUERendererService.getInstance().getRenderer() == null)
-            CUERendererService.getInstance().setRenderer(new CUERenderer(this));
-        return CUERendererService.getInstance().getRenderer();
-    }
-
-    /**
-     * Use the FrameLayout in this Activity's UI.
-     */
-    @Override
-    protected FrameLayout supplyFrameLayout() {
-        return (FrameLayout) this.findViewById(R.id.mainLayout);
     }
 
     private boolean checkCameraPermission() {
@@ -136,49 +112,41 @@ public class MainActivity extends ARActivity implements LocationListener, Sensor
         if (loc == null)
             return;
 
-        this.lastKnownPosition = new CUELocation(loc);
-
+        this.world.setGeoPosition(loc.getLatitude(), loc.getLongitude());
     }
 
-    private float[] accel = null;
-    private float[] geomagentic = null;
-
-    // when any sensor gets a new value this function is run
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        Log.d("cuear", "sensor changed!");
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-            accel = event.values;
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-            geomagentic = event.values;
+    public void onTouchBeyondarView(MotionEvent event, BeyondarGLSurfaceView beyondarView) {
+        float x = event.getX();
+        float y = event.getY();
 
-        if (lastKnownPosition == null || accel == null || geomagentic == null)
-            return;
+        ArrayList<BeyondarObject> geoObjects = new ArrayList<BeyondarObject>();
 
-        if (CUEGeoFence.shouldActivate(lastKnownPosition)) {
-            float R[] = new float[9];
-            float I[] = new float[9];
-            boolean success = SensorManager.getRotationMatrix(R, I, accel, geomagentic);
-            if (success) {
-                float[] orientation = new float[3];
-                SensorManager.getOrientation(R, orientation);
-                float azimuthRadians = orientation[0];
-
-                double distance = CUELocationUtils.getDistance(lastKnownPosition, eastCourtyard);
-                double angle = CUELocationUtils.getAngleAsDegrees(lastKnownPosition, eastCourtyard) * Math.PI / 180.0;
-                double x = CUELocationUtils.getObjectScreenX(angle, azimuthRadians, distance);
-                double y = CUELocationUtils.getObjectScreenY(angle, azimuthRadians, distance);
-
-                int sx = (int) Math.floor(x);
-                int sy = (int) Math.floor(y);
-                if(getCameraPreview() != null)
-                    CUERendererService.getInstance().getRenderer().setText("Welcome to East!", sx, sy);
-            }
+        beyondarView.getBeyondarObjectsOnScreenCoordinates(x, y, geoObjects);
+        Iterator<BeyondarObject> iterator = geoObjects.iterator();
+        while(iterator.hasNext()) {
+            BeyondarObject next = iterator.next();
+            DialogFragment newFragment = MyDialogFragment.newInstance();
+            MyDialogFragment.text = next.getName();
+            newFragment.show(getSupportFragmentManager(), "dialog");
         }
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
+    public static class MyDialogFragment extends DialogFragment {
 
+        public static String text;
+        static MyDialogFragment newInstance() {
+            text = "Hello World";
+            return new MyDialogFragment();
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.popup, container, false);
+            View tv = v.findViewById(R.id.popupText);
+            ((TextView)tv).setText(text);
+            return v;
+        }
+    }
 }

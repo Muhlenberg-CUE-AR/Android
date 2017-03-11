@@ -7,12 +7,11 @@ package muhlenberg.edu.cue.services.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.*;
+import android.database.sqlite.SQLiteDatabase;
 
 import muhlenberg.edu.cue.services.AbstractService;
 import muhlenberg.edu.cue.util.location.CUELocation;
 
-import static muhlenberg.edu.cue.ARSimpleApplication.getContext;
 
 public class CUEDatabaseService extends AbstractService {
 
@@ -197,7 +196,7 @@ public class CUEDatabaseService extends AbstractService {
      */
     @Override
     public void start(Context context) {
-        this.mDbHelper = new CUEDatabaseHelper(getContext());
+        this.mDbHelper = new CUEDatabaseHelper(context);
         this.sql = mDbHelper.getWritableDatabase();
 
         mDbHelper.close();
