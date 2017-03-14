@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -53,17 +54,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         this.world = new World(this);
         this.world.setGeoPosition(40.550616, -75.402740);
 
-        GeoObject east = new GeoObject(2l);
-        east.setGeoPosition(40.598827, -75.508126);
-        east.setImageResource(R.drawable.road_overlay);
-        east.setName("East");
-        east.setText("East");
+        CUEDatabaseService.getInstance().start(this);
+        displayAllPOI();
 
-        this.world.addBeyondarObject(east);
-
-        mBeyondarFragment.setWorld(this.world);
         mBeyondarFragment.setOnTouchBeyondarViewListener(this);
-        mBeyondarFragment.setMaxDistanceToRender(500);
     }
 
     @Override
@@ -125,8 +119,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         for(int i=0; i<buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());
             poi.setName(buildings[i].getName());
+            poi.setText(buildings[i].getName());
+            poi.setImageResource(R.drawable.base_poi_background);
+            poi.setGeoPosition(buildings[i].getLat(), buildings[i].getLng());
 
+            this.world.addBeyondarObject(poi);
+            Log.d("cuear", "added " + buildings[i].getName());
         }
+
+        mBeyondarFragment.setWorld(this.world);
     }
     private void showPopup(String text) {
         DialogFragment newFragment = CUEPopup.newInstance();

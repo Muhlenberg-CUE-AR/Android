@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import muhlenberg.edu.cue.services.AbstractService;
 import muhlenberg.edu.cue.util.location.CUELocation;
@@ -46,8 +47,9 @@ public class CUEDatabaseService extends AbstractService {
     }
 
     public Building[] readAllPOI () {
-        String selectQuery = "SELECT  * FROM " + CUEDatabaseContract.FeedEntry.TABLE_NAME;
+        String selectQuery = "SELECT * FROM " + CUEDatabaseContract.FeedEntry.TABLE_NAME;
         Cursor cursor = sql.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
 
         Building[] buildings = new Building[cursor.getCount()];
         for(int i=0; i<buildings.length; i++) {
@@ -57,6 +59,7 @@ public class CUEDatabaseService extends AbstractService {
                     cursor.getString(LONG_DESC),
                     cursor.getFloat(LATITUDE),
                     cursor.getFloat(LONGITUDE));
+            cursor.moveToNext();
         }
         cursor.close();
 
@@ -131,8 +134,6 @@ public class CUEDatabaseService extends AbstractService {
     public void start(Context context) {
         mDbHelper = new CUEDatabaseHelper(context);
         sql = mDbHelper.getWritableDatabase();
-
-        mDbHelper.close();
     }
 
     /*
