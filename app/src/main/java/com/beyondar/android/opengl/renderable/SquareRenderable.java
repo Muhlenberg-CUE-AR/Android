@@ -23,6 +23,8 @@ import com.beyondar.android.util.math.geom.Point3;
 import com.beyondar.android.util.math.geom.Vector3;
 import com.beyondar.android.world.BeyondarObject;
 
+import muhlenberg.edu.cue.util.text.GLText;
+
 /**
  * Basic {@link com.beyondar.android.opengl.renderable.Renderable Renderable}
  * for rendering simple 2D images.

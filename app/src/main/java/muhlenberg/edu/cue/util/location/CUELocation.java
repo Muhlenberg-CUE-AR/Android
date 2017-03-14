@@ -12,6 +12,11 @@ public class CUELocation {
 
     private double lat, lng, altitude;
 
+    public CUELocation() {
+        this.lat = Double.NaN;
+        this.lng = Double.NaN;
+        this.altitude = Double.NaN;
+    }
 
     public CUELocation(Location location) {
         this.lat = location.getLatitude();

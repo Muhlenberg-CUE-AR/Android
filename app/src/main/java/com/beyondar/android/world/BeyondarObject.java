@@ -50,6 +50,7 @@ public class BeyondarObject implements Plugable<BeyondarObjectPlugin> {
 	private Point3 mScreenPositionTopLeft, mScreenPositionTopRight, mScreenPositionBottomLeft,
 			mScreenPositionBottomRight, mScreenPositionCenter;
 	private Point3 mTopLeft, mBottomLeft, mBottomRight, mTopRight;
+	private String text;
 
 	/** This fields contains all the loaded plugins. */
 	protected List<BeyondarObjectPlugin> plugins;
@@ -96,6 +97,7 @@ public class BeyondarObject implements Plugable<BeyondarObjectPlugin> {
 		mScreenPositionBottomLeft = new Point3();
 		mScreenPositionBottomRight = new Point3();
 		mScreenPositionCenter = new Point3();
+		text = "";
 	}
 
 	/**
@@ -715,5 +717,14 @@ public class BeyondarObject implements Plugable<BeyondarObjectPlugin> {
 		// Generate the collision detector
 		mMeshCollider = new SquareMeshCollider(topLeft, bottomLeft, bottomRight, topRight);
 		return mMeshCollider;
+	}
+
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public String getText() {
+		return this.text;
 	}
 }

@@ -8,16 +8,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragmentSupport;
-import com.beyondar.android.opengl.renderable.SquareRenderable;
 import com.beyondar.android.util.math.geom.Point3;
 import com.beyondar.android.view.BeyondarGLSurfaceView;
 import com.beyondar.android.view.OnTouchBeyondarViewListener;
@@ -29,7 +23,10 @@ import com.google.android.gms.location.LocationListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import muhlenberg.edu.cue.services.database.Building;
+import muhlenberg.edu.cue.services.database.CUEDatabaseService;
 import muhlenberg.edu.cue.services.location.CUELocationService;
+import muhlenberg.edu.cue.util.fragments.CUEPopup;
 
 /**
  * Created by Jalal on 1/28/2017.
@@ -41,8 +38,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private BeyondarFragmentSupport mBeyondarFragment;
     private World world;
-
-    private Point3 roadEnd = new Point3(40.550939f, -75.401617f, 0.0f);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,19 +54,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         this.world = new World(this);
         this.world.setGeoPosition(40.550616, -75.402740);
 
-        GeoObject frontDoor = new GeoObject(1l);
-        frontDoor.setImageResource(R.drawable.home_text);
-        frontDoor.setGeoPosition(40.550699, -75.402833);
-        frontDoor.setName("Home");
+        GeoObject east = new GeoObject(2l);
+        east.setGeoPosition(40.598827, -75.508126);
+        east.setImageResource(R.drawable.road_overlay);
+        east.setName("East");
+        east.setText("East");
 
-
-        GeoObject road = new GeoObject(2l);
-        road.setGeoPosition(40.550781f, -75.403289f);
-        road.setImageResource(R.drawable.road_overlay);
-        road.setName("Road");
-
-        this.world.addBeyondarObject(frontDoor);
-        this.world.addBeyondarObject(road);
+        this.world.addBeyondarObject(east);
 
         mBeyondarFragment.setWorld(this.world);
         mBeyondarFragment.setOnTouchBeyondarViewListener(this);
@@ -82,12 +71,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onResume() {
         super.onResume();
         CUELocationService.getInstance(this).start(this);
+        CUEDatabaseService.getInstance().start(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         CUELocationService.getInstance(this).stop(this);
+        CUEDatabaseService.getInstance().stop(this);
     }
 
     private boolean checkCameraPermission() {
@@ -126,27 +117,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Iterator<BeyondarObject> iterator = geoObjects.iterator();
         while(iterator.hasNext()) {
             BeyondarObject next = iterator.next();
-            DialogFragment newFragment = MyDialogFragment.newInstance();
-            MyDialogFragment.text = next.getName();
-            newFragment.show(getSupportFragmentManager(), "dialog");
+            showPopup(next.getName());
         }
     }
 
-    public static class MyDialogFragment extends DialogFragment {
+    private void displayAllPOI() {
+        Building[] buildings = CUEDatabaseService.getInstance().readAllPOI();
+        for(int i=0; i<buildings.length; i++) {
+            GeoObject poi = new GeoObject(buildings[i].getId());
+            poi.setName(buildings[i].getName());
 
-        public static String text;
-        static MyDialogFragment newInstance() {
-            text = "Hello World";
-            return new MyDialogFragment();
         }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.popup, container, false);
-            View tv = v.findViewById(R.id.popupText);
-            ((TextView)tv).setText(text);
-            return v;
-        }
+    }
+    private void showPopup(String text) {
+        DialogFragment newFragment = CUEPopup.newInstance();
+        CUEPopup.text = text;
+        newFragment.show(getSupportFragmentManager(), "dialog");
     }
 }

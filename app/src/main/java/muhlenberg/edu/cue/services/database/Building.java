@@ -25,12 +25,17 @@ public class Building {
 
     public Building(long id, String name, String shortDesc, String longDesc, Float lat, Float lng){
         // sets all fields given through the constructor
-        this.id = id;
+        this.id = -1;
         this.name = name;
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
         this.lat = lat;
         this.lng = lng;
+
+        this.activationBoxNE = new CUELocation();
+        this.activationBoxNW = new CUELocation();
+        this.activationBoxSE = new CUELocation();
+        this.activationBoxSW = new CUELocation();
     }
 
     // sets the lat, lng for the activation box
