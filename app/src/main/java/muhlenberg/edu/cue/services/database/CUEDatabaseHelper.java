@@ -28,8 +28,8 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_NAME_NAME + " TEXT," +
                     COLUMN_NAME_SHORT_DESC + " TEXT," +
                     COLUMN_NAME_LONG_DESC + " TEXT," +
-                    COLUMN_NAME_LATITUDE + " NUM," +
-                    COLUMN_NAME_LONGITUDE + " NUM," +
+                    COLUMN_NAME_LATITUDE + " REAL," +
+                    COLUMN_NAME_LONGITUDE + " REAL," +
                     COLUMN_NAME_ACTIVATION_BOX1 + " TEXT," +
                     COLUMN_NAME_ACTIVATION_BOX2 + " TEXT," +
                     COLUMN_NAME_ACTIVATION_BOX3 + " TEXT," +
@@ -73,7 +73,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC, b.getShortDesc());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC, b.getLongDesc());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE, b.getLat());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, b.getLon());
+        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, b.getLng());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1, b.getActivationBoxNE().toString());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2, b.getActivationBoxNW().toString());
         values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3, b.getActivationBoxSE().toString());

@@ -58,7 +58,7 @@ public class Building {
 
     public Float getLat() { return this.lat; }
 
-    public Float getLon() { return this.lng; }
+    public Float getLng() { return this.lng; }
 
     public CUELocation getActivationBoxNE() { return this.activationBoxNE; }
 
