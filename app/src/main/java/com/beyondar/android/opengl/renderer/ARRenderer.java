@@ -870,6 +870,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
      */
     public void loadBeyondarObjectTexture(GL10 gl, BeyondarObject geoObject) {
 
+        //check for cache first?
         Bitmap btm = mWorld.getBitmapCache().getBitmap(geoObject.getImageUri());
 
         if (geoObject.getText() != null && !geoObject.getText().isEmpty()) {
