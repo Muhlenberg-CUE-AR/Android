@@ -96,13 +96,13 @@ public class SquareRenderable implements Renderable {
 		} else {
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, mTexture.getTexturePointer());
 		}
-
 		// Point to our buffers
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
 		// Set the face rotation
 		gl.glFrontFace(GL10.GL_CW);
+
 
 		// Point to our vertex buffer
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, texture.getVerticesBuffer());

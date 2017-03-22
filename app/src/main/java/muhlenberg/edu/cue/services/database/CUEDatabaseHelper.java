@@ -53,7 +53,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
 
-        Building[] buildings = new Building[5];
+        Building[] buildings = new Building[6];
 
         // creates building objects to be stored in an array
         buildings[0] = new Building(-1, "Trumbower", "Building", "Math and Science", 40.597450f, -75.510855f);
@@ -61,6 +61,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
         buildings[2] = new Building(-1, "New Science", "Building", "New Science Building", 40.597207f, -75.511698f);
         buildings[3] = new Building(-1, "Ettinger", "Building", "Business and History", 40.597804f, -75.509426f);
         buildings[4] = new Building(-1, "Moyer", "Building", "Useless Majors", 40.597930f, -75.508640f);
+        buildings[5] = new Building(-1, "Life Sports Center", "Building", "Gym", 40.599069f, -75.509579f);
 
         for(int i=0; i<buildings.length; i++){
             insertPOI(buildings[i], db);

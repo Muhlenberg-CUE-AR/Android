@@ -50,14 +50,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     MY_PERMISSIONS_REQUEST_CAMERA);
         }
 
-        mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(R.id.beyondarFragment);
-        this.world = new World(this);
-        this.world.setGeoPosition(40.550616, -75.402740);
-
         CUEDatabaseService.getInstance().start(this);
+        this.world = new World(this);
         displayAllPOI();
+        
 
-        mBeyondarFragment.setOnTouchBeyondarViewListener(this);
     }
 
     @Override
@@ -65,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onResume();
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
+
+        CUELocationService.DEBUG = true;
     }
 
     @Override
@@ -93,11 +92,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onLocationChanged(Location loc) {
+        Log.d("cuear", "received new location");
         if (loc == null)
             return;
 
         this.world.setGeoPosition(loc.getLatitude(), loc.getLongitude());
     }
+
+
 
     @Override
     public void onTouchBeyondarView(MotionEvent event, BeyondarGLSurfaceView beyondarView) {
@@ -124,10 +126,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             poi.setGeoPosition(buildings[i].getLat(), buildings[i].getLng());
 
             this.world.addBeyondarObject(poi);
-            Log.d("cuear", "added " + buildings[i].getName());
         }
 
+        mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(R.id.beyondarFragment);
+        this.world.setGeoPosition(40.550616, -75.402740);
+
         mBeyondarFragment.setWorld(this.world);
+        mBeyondarFragment.startRenderingAR();
+        mBeyondarFragment.setOnTouchBeyondarViewListener(this);
     }
     private void showPopup(String text) {
         DialogFragment newFragment = CUEPopup.newInstance();

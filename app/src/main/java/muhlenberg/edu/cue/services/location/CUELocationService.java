@@ -36,6 +36,8 @@ public class CUELocationService extends AbstractService {
      */
     private GoogleApiClient googleApiClient;
 
+    public static boolean DEBUG = false;
+
     public static CUELocationService getInstance(Context context) {
         if (instance == null)
             instance = new CUELocationService(context);
@@ -133,7 +135,7 @@ public class CUELocationService extends AbstractService {
      * @return LocationRequest
      */
     private LocationRequest buildLocationRequest() {
-        LocationRequest locationRequest = new LocationRequest();
+        LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
