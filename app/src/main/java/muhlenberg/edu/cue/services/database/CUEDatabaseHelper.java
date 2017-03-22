@@ -6,16 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC;
-import static muhlenberg.edu.cue.services.database.CUEDatabaseContract.FeedEntry.TABLE_NAME;
+
 
 public class CUEDatabaseHelper extends SQLiteOpenHelper {
     /*
@@ -23,20 +14,34 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
         automatically for each entry.
      */
     private static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + TABLE_NAME + " (" +
+            "CREATE TABLE " + CUEDatabaseContract.POI.TABLE_NAME + " (" +
+                    _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_NAME + " TEXT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_SHORT_DESC + " TEXT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_LONG_DESC + " TEXT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_LATITUDE + " REAL," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_LONGITUDE + " REAL," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX1 + " TEXT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX2 + " TEXT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX3 + " TEXT," +
+                    CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX4 + " TEXT)" ;
+
+    private static final String SQL_CREATE_TOUR_TABLE =
+            "CREATE TABLE " + CUEDatabaseContract.Tour.TABLE_NAME + " (" +
                     _ID + " INTEGER PRIMARY KEY," +
-                    COLUMN_NAME_NAME + " TEXT," +
-                    COLUMN_NAME_SHORT_DESC + " TEXT," +
-                    COLUMN_NAME_LONG_DESC + " TEXT," +
-                    COLUMN_NAME_LATITUDE + " REAL," +
-                    COLUMN_NAME_LONGITUDE + " REAL," +
-                    COLUMN_NAME_ACTIVATION_BOX1 + " TEXT," +
-                    COLUMN_NAME_ACTIVATION_BOX2 + " TEXT," +
-                    COLUMN_NAME_ACTIVATION_BOX3 + " TEXT," +
-                    COLUMN_NAME_ACTIVATION_BOX4 + " TEXT)" ;
+                    CUEDatabaseContract.Tour.COLUMN_NAME_NAME + " TEXT)";
+
+    private static final String SQL_CREATE_POINT_TABLE =
+            "CREATE TABLE " + CUEDatabaseContract.Point.TABLE_NAME + " (" +
+                    CUEDatabaseContract.Point.COLUMN_NAME_TOUR_ID + " INTEGER," +
+                    CUEDatabaseContract.Point.COLUMN_NAME_ORDER_NUMBER + " INTEGER," +
+                    CUEDatabaseContract.Point.COLUMN_NAME_LATITUDE + " TEXT," +
+                    CUEDatabaseContract.Point.COLUMN_NAME_LONGITUDE + " TEXT," +
+                        "FOREIGN KEY (TOUR_ID) REFERENCES TOUR(_ID)";
+
 
     //Used to remove the table when needed
-    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + CUEDatabaseContract.POI.TABLE_NAME;
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -51,7 +56,11 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
      * @param db
      */
     public void onCreate(SQLiteDatabase db) {
+        // creates tables within database
         db.execSQL(SQL_CREATE_ENTRIES);
+        db.execSQL(SQL_CREATE_TOUR_TABLE);
+        db.execSQL(SQL_CREATE_POINT_TABLE);
+
 
         Building[] buildings = new Building[5];
 
@@ -69,18 +78,18 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
 
     private long insertPOI(Building b, SQLiteDatabase db) {
         ContentValues values = new ContentValues();
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME, b.getName());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC, b.getShortDesc());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC, b.getLongDesc());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE, b.getLat());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE, b.getLng());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1, b.getActivationBoxNE().toString());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2, b.getActivationBoxNW().toString());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3, b.getActivationBoxSE().toString());
-        values.put(CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4, b.getActivationBoxSW().toString());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_NAME, b.getName());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_SHORT_DESC, b.getShortDesc());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_LONG_DESC, b.getLongDesc());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_LATITUDE, b.getLat());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_LONGITUDE, b.getLng());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX1, b.getActivationBoxNE().toString());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX2, b.getActivationBoxNW().toString());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX3, b.getActivationBoxSE().toString());
+        values.put(CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX4, b.getActivationBoxSW().toString());
 
         //Inserts the POI and returns the ID
-        return db.insert(CUEDatabaseContract.FeedEntry.TABLE_NAME, null, values);
+        return db.insert(CUEDatabaseContract.POI.TABLE_NAME, null, values);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
