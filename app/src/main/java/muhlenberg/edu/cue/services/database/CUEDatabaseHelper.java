@@ -4,6 +4,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
+
+import muhlenberg.edu.cue.MainActivity;
+import muhlenberg.edu.cue.util.location.CUELocation;
 
 import static android.provider.BaseColumns._ID;
 
@@ -43,12 +53,16 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
     //Used to remove the table when needed
     private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + CUEDatabaseContract.POI.TABLE_NAME;
 
+    // Main Activity Context
+    Context context;
+
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "FeedReader.db";
 
     public CUEDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     /**
@@ -101,5 +115,33 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    /*
+    Reads the file of points from an .txt file in the asset folder
+ */
+    public void readPointListFromAsset() {
+        BufferedReader reader = null;
+        List<CUELocation> pointList;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(this.context.getAssets().open("TestTour.txt")));
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                Log.d("Line Read", mLine);
+            }
+        } catch (IOException e) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //log the exception
+                }
+            }
+        }
     }
 }

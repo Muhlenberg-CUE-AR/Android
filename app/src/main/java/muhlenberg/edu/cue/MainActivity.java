@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         if (!checkCameraPermission()) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},

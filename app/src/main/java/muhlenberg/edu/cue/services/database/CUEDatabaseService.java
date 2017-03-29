@@ -8,6 +8,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import muhlenberg.edu.cue.MainActivity;
 import muhlenberg.edu.cue.services.AbstractService;
 
 
