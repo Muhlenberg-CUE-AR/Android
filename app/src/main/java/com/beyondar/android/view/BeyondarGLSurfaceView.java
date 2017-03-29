@@ -93,7 +93,7 @@ public class BeyondarGLSurfaceView extends GLSurfaceView implements OnBeyondarOb
 		// This call will allow the GLSurface to be on the top of all the
 		// Surfaces. It is needed because when the camera is rotated the camera
 		// tend to overlap the GLSurface.
-//		setZOrderMediaOverlay(true);
+		setZOrderMediaOverlay(true);
 		setFocusableInTouchMode(true);
 	}
 

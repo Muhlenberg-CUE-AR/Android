@@ -76,12 +76,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
 
-        CameraView preview = mBeyondarFragment.getCameraView();
-        preview.setVisibility(View.VISIBLE);
-        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
-        this.processing = new ShowGradient();
-        this.processing.init(new Visualization(this), preview.getCamera(), info, preview.getCameraDisplayOrientation());
+//        CameraView preview = mBeyondarFragment.getCameraView();
+//        preview.setVisibility(View.VISIBLE);
+//        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+//        android.hardware.Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+//        this.processing = new ShowGradient();
+//        this.processing.init(new Visualization(this), preview.getCamera(), info, preview.getCameraDisplayOrientation());
     }
 
     @Override
@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
 
         this.world.setGeoPosition(40.550616, -75.402740);
-
         mBeyondarFragment.setWorld(this.world);
         mBeyondarFragment.setOnTouchBeyondarViewListener(this);
         mBeyondarFragment.startRenderingAR();
