@@ -4,14 +4,16 @@ package muhlenberg.edu.cue.services.database;
  * Created by jason on 2/7/17.
  */
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import muhlenberg.edu.cue.MainActivity;
 import muhlenberg.edu.cue.services.AbstractService;
-import muhlenberg.edu.cue.util.location.CUELocation;
 
 
 public class CUEDatabaseService extends AbstractService {
@@ -47,7 +49,7 @@ public class CUEDatabaseService extends AbstractService {
     }
 
     public Building[] readAllPOI () {
-        String selectQuery = "SELECT * FROM " + CUEDatabaseContract.FeedEntry.TABLE_NAME;
+        String selectQuery = "SELECT * FROM " + CUEDatabaseContract.POI.TABLE_NAME;
         Cursor cursor = sql.rawQuery(selectQuery, null);
         cursor.moveToFirst();
 
@@ -73,26 +75,26 @@ public class CUEDatabaseService extends AbstractService {
     public Building readPOI(String name) {
         // The rows that will be read (which is every row in this case)
         String[] projection = {
-                CUEDatabaseContract.FeedEntry._ID,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_SHORT_DESC,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONG_DESC,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_LATITUDE,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_LONGITUDE,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX1,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX2,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX3,
-                CUEDatabaseContract.FeedEntry.COLUMN_NAME_ACTIVATION_BOX4
+                CUEDatabaseContract.POI._ID,
+                CUEDatabaseContract.POI.COLUMN_NAME_NAME,
+                CUEDatabaseContract.POI.COLUMN_NAME_SHORT_DESC,
+                CUEDatabaseContract.POI.COLUMN_NAME_LONG_DESC,
+                CUEDatabaseContract.POI.COLUMN_NAME_LATITUDE,
+                CUEDatabaseContract.POI.COLUMN_NAME_LONGITUDE,
+                CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX1,
+                CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX2,
+                CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX3,
+                CUEDatabaseContract.POI.COLUMN_NAME_ACTIVATION_BOX4
         };
 
         // Find the correct row based off the name of the POI
-        String selection = CUEDatabaseContract.FeedEntry.COLUMN_NAME_NAME + " = ?";
+        String selection = CUEDatabaseContract.POI.COLUMN_NAME_NAME + " = ?";
         String[] selectionArgs = { name };
 
         // Reads from the database into cursor, using the table and the selected columns
         // and gets all the data from the given name
         Cursor cursor = sql.query(
-                CUEDatabaseContract.FeedEntry.TABLE_NAME,
+                CUEDatabaseContract.POI.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,

@@ -16,7 +16,7 @@ public final class CUEDatabaseContract {
     }
 
     /* Inner class that defines the table contents */
-    public static class FeedEntry implements BaseColumns {
+    public static class POI implements BaseColumns {
         public static final String TABLE_NAME = "POI";
         public static final String COLUMN_NAME_NAME = "Name";
         public static final String COLUMN_NAME_SHORT_DESC = "ShortDesc";
@@ -30,6 +30,18 @@ public final class CUEDatabaseContract {
 
     }
 
+    public static class Tour implements BaseColumns {
+        public static final String TABLE_NAME = "Tour";
+        public static final String COLUMN_NAME_NAME = "Name";
+    }
+
+    public static class Point implements BaseColumns {
+        public static final String TABLE_NAME = "Point";
+        public static final String COLUMN_NAME_TOUR_ID = "TOUR_ID";
+        public static final String COLUMN_NAME_LATITUDE = "Latitude";
+        public static final String COLUMN_NAME_LONGITUDE = "Longitude";
+        public static final String COLUMN_NAME_ORDER_NUMBER = "OrderNumber";
+    }
 }
 
 
