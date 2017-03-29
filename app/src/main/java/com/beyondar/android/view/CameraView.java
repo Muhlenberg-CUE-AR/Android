@@ -273,7 +273,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 	}
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	private int getCameraDisplayOrientation() {
+	public int getCameraDisplayOrientation() {
 		int rotation = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
 				.getDefaultDisplay().getRotation();
 		int degrees = 0;
