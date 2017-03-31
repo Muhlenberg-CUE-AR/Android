@@ -15,11 +15,6 @@
  */
 package com.beyondar.android.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.microedition.khronos.opengles.GL;
-
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.hardware.SensorManager;
@@ -40,6 +35,11 @@ import com.beyondar.android.util.Logger;
 import com.beyondar.android.util.math.geom.Ray;
 import com.beyondar.android.world.BeyondarObject;
 import com.beyondar.android.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.microedition.khronos.opengles.GL;
 
 /**
  * GL View to draw the {@link com.beyondar.android.world.World World} using the
@@ -93,7 +93,7 @@ public class BeyondarGLSurfaceView extends GLSurfaceView implements OnBeyondarOb
 		// This call will allow the GLSurface to be on the top of all the
 		// Surfaces. It is needed because when the camera is rotated the camera
 		// tend to overlap the GLSurface.
-		setZOrderMediaOverlay(true);
+		setZOrderOnTop(true);
 		setFocusableInTouchMode(true);
 	}
 

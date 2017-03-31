@@ -1,15 +1,22 @@
 package muhlenberg.edu.cue;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragment;
@@ -23,6 +30,7 @@ import com.google.android.gms.location.LocationListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import boofcv.android.gui.VideoDisplayActivity;
 import boofcv.android.gui.VideoProcessing;
@@ -55,21 +63,30 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         }
 
         CUEDatabaseService.getInstance().start(this);
-        beyondarFragment = (BeyondarFragment) BeyondarFragment.instantiate(this, "com.beyondar.android.fragment.BeyondarFragment");
-        getViewContent().setId(305);
 
-        getFragmentManager().beginTransaction().add(305, beyondarFragment, "beyondar").commit();
+        getViewContent().removeAllViews();
+        FrameLayout mainLayout = new FrameLayout(this);
+        mainLayout.setId(100);
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        FrameLayout preview = getViewPreview();
+
+        mainLayout.addView(preview);
+
+        setContentView(mainLayout, params);
+
+        beyondarFragment = new BeyondarFragment();
+        getFragmentManager().beginTransaction().add(mainLayout.getId(), beyondarFragment, "beyondar").commit();
         getFragmentManager().executePendingTransactions();
 
-        this.world = new World(this);
+        setShowFPS(true);
     }
 
     @Override
     public void onResume() {
-        super.onResume();
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
-
+        setProcessing(new ShowGradient());
+        super.onResume();
     }
 
     @Override
@@ -78,10 +95,91 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     }
 
     @Override
-    protected Camera openConfigureCamera(Camera.CameraInfo cameraInfo) {
-        Camera cam = beyondarFragment.getCameraView().getCamera();
+    protected Camera openConfigureCamera( Camera.CameraInfo cameraInfo )
+    {
+        Camera mCamera = selectAndOpenCamera(cameraInfo);
+        Camera.Parameters param = mCamera.getParameters();
+
+        // Select the preview size closest to 320x240
+        // Smaller images are recommended because some computer vision operations are very expensive
+        List<Camera.Size> sizes = param.getSupportedPreviewSizes();
+        Camera.Size s = sizes.get(closest(sizes,320,240));
+        param.setPreviewSize(s.width,s.height);
+        mCamera.setParameters(param);
+
         displayAllPOI();
-        return cam;
+
+        return mCamera;
+    }
+
+    /**
+     * Step through the camera list and select a camera.  It is also possible that there is no camera.
+     * The camera hardware requirement in AndroidManifest.xml was turned off so that devices with just
+     * a front facing camera can be found.  Newer SDK's handle this in a more sane way, but with older devices
+     * you need this work around.
+     */
+    private Camera selectAndOpenCamera(Camera.CameraInfo info) {
+        int numberOfCameras = Camera.getNumberOfCameras();
+
+        int selected = -1;
+
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.getCameraInfo(i, info);
+
+            if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
+                selected = i;
+                break;
+            } else {
+                // default to a front facing camera if a back facing one can't be found
+                selected = i;
+            }
+        }
+
+        if( selected == -1 ) {
+            dialogNoCamera();
+            return null; // won't ever be called
+        } else {
+            return Camera.open(selected);
+        }
+    }
+
+    /**
+     * Gracefully handle the situation where a camera could not be found
+     */
+    private void dialogNoCamera() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your device has no cameras!")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        System.exit(0);
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * Goes through the size list and selects the one which is the closest specified size
+     */
+    public static int closest(List<Camera.Size> sizes , int width , int height ) {
+        int best = -1;
+        int bestScore = Integer.MAX_VALUE;
+
+        for( int i = 0; i < sizes.size(); i++ ) {
+            Camera.Size s = sizes.get(i);
+
+            int dx = s.width-width;
+            int dy = s.height-height;
+
+            int score = dx*dx + dy*dy;
+            if( score < bestScore ) {
+                best = i;
+                bestScore = score;
+            }
+        }
+
+        return best;
     }
 
     @Override
@@ -134,6 +232,8 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     }
 
     private void displayAllPOI() {
+        this.world = new World(this);
+        this.world.setDefaultImage(R.drawable.road_overlay);
         Building[] buildings = CUEDatabaseService.getInstance().readAllPOI();
         for(int i=0; i<buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());

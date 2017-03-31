@@ -50,6 +50,5 @@ public class ShowGradient extends VideoImageProcessing<GrayU8> {
     protected void process(GrayU8 image, Bitmap output, byte[] storage) {
         gradient.process(image, derivX, derivY);
         VisualizeImageData.colorizeGradient(derivX, derivY, -1, output, storage);
-        Log.d("cuear", "processed in showgradient");
     }
 }

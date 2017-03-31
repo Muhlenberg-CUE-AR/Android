@@ -39,6 +39,7 @@ import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.Surface;
 
 import com.beyondar.android.opengl.renderable.Renderable;
@@ -763,7 +764,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+        Log.d("cueardraw", "renderer surface created");
         // Let's check the available OpenGL Extensions:
         checkGlExtensions(gl);
 
@@ -806,6 +807,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         // GL10.GL_REPLACE);
 
         gl.glClearColor(0, 0, 0, 0);
+
 
         sTextureHolder.clear();
         Logger.d(TAG, "Loading textures...");

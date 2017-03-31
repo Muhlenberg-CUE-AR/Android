@@ -134,8 +134,10 @@ public class CUEDatabaseService extends AbstractService {
      */
     @Override
     public void start(Context context) {
-        mDbHelper = new CUEDatabaseHelper(context);
-        sql = mDbHelper.getWritableDatabase();
+        if(mDbHelper == null && sql == null) {
+            mDbHelper = new CUEDatabaseHelper(context);
+            sql = mDbHelper.getWritableDatabase();
+        }
     }
 
     /*
