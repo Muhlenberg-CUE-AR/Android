@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Build;
@@ -34,6 +35,8 @@ import android.view.WindowManager;
 import com.beyondar.android.util.DebugBitmap;
 import com.beyondar.android.util.GoogleGlassUtils;
 import com.beyondar.android.util.Logger;
+
+import boofcv.android.gui.VideoProcessing;
 
 /**
  * This class has the responsibility of rotating the camera, taking picture and
@@ -71,7 +74,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 
 	private Size mPreviewSize;
 	private List<Size> mSupportedPreviewSizes;
-	private List<String> mSupportedFlashModes;
 
 	private boolean mIsPreviewing;
 
@@ -125,7 +127,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		}
 		if (mCamera != null) {
 			mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
-			mSupportedFlashModes = mCamera.getParameters().getSupportedFlashModes();
+			List<String> mSupportedFlashModes = mCamera.getParameters().getSupportedFlashModes();
 			// Set the camera to Auto Flash mode.
 			if (mSupportedFlashModes != null
 					&& mSupportedFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
@@ -136,7 +138,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		}
 	}
 
-	/**
+
+    /**
 	 * Check if the camera is previewing, if so the user should see what the
 	 * Camera is pointing at.
 	 * 
@@ -166,6 +169,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 			mCamera = null;
 			Logger.e(TAG, "CameraView -- ERROR en SurfaceCreated", exception);
 		}
+		setWillNotDraw(false);
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
@@ -267,7 +271,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		{
 			parameters.setPreviewFpsRange(30000, 30000);
 		}
-		
+
 		mCamera.setParameters(parameters);
 		startPreviewCamera();
 	}
@@ -394,13 +398,38 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		Logger.v(TAG, "getTheCamera");
 		// keep trying to acquire the camera until "maximumWaitTimeForCamera"
 		// seconds have passed
-		boolean acquiredCam = false;
 		int timePassed = 0;
-		while (!acquiredCam && timePassed < MAX_TIME_WAIT_FOR_CAMERA) {
+		while ( timePassed < MAX_TIME_WAIT_FOR_CAMERA) {
 			try {
 				mCamera = Camera.open();
+                Camera.Parameters parameters = mCamera.getParameters();
+
+                int orientation = 0;
+
+                if (Build.VERSION.SDK_INT < 9) {
+                    if (isPortrait()) {
+                        parameters.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_PORTRAIT);
+                        orientation = 90;
+                    } else {
+                        parameters.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_LANDSCAPE);
+                        orientation = 0;
+                    }
+                } else {
+                    orientation = getCameraDisplayOrientation();
+                    parameters.setRotation(orientation);
+                }
+                mCamera.setDisplayOrientation(orientation);
+
+                parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+
+                // Fix for the first versions of google glass
+                if (GoogleGlassUtils.isGoogleGlass())
+                {
+                    parameters.setPreviewFpsRange(30000, 30000);
+                }
+
+                mCamera.setParameters(parameters);
 				Logger.v(TAG, "acquired the camera");
-				acquiredCam = true;
 				return true;
 			} catch (Exception e) {
 				Logger.e(TAG, "Exception encountered opening camera:" + e.getLocalizedMessage());

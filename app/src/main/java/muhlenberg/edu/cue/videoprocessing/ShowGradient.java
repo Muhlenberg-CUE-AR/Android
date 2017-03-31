@@ -1,6 +1,8 @@
 package muhlenberg.edu.cue.videoprocessing;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.Log;
 
 import boofcv.abst.filter.derivative.ImageGradient;
@@ -25,6 +27,7 @@ public class ShowGradient extends VideoImageProcessing<GrayU8> {
 
     public ShowGradient() {
         super(ImageType.single(GrayU8.class));
+        Log.d("cuear", "new showgradient created");
     }
     /**
      * Constructor
@@ -47,6 +50,6 @@ public class ShowGradient extends VideoImageProcessing<GrayU8> {
     protected void process(GrayU8 image, Bitmap output, byte[] storage) {
         gradient.process(image, derivX, derivY);
         VisualizeImageData.colorizeGradient(derivX, derivY, -1, output, storage);
-
+        Log.d("cuear", "processed in showgradient");
     }
 }
