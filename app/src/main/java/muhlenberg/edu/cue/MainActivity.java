@@ -5,22 +5,17 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragment;
-import com.beyondar.android.fragment.BeyondarFragmentSupport;
 import com.beyondar.android.view.BeyondarGLSurfaceView;
 import com.beyondar.android.view.OnTouchBeyondarViewListener;
 import com.beyondar.android.world.BeyondarObject;
@@ -33,13 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import boofcv.android.gui.VideoDisplayActivity;
-import boofcv.android.gui.VideoProcessing;
 import muhlenberg.edu.cue.services.database.Building;
 import muhlenberg.edu.cue.services.database.CUEDatabaseService;
 import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
-import muhlenberg.edu.cue.videoprocessing.ShowGradient;
-import muhlenberg.edu.cue.videoprocessing.Visualization;
+import muhlenberg.edu.cue.videoprocessing.CannyEdge;
+import muhlenberg.edu.cue.videoprocessing.PolygonFitting;
 
 /**
  * Created by Jalal on 1/28/2017.
@@ -85,7 +79,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     public void onResume() {
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
-        setProcessing(new ShowGradient());
+        setProcessing(new PolygonFitting());
         super.onResume();
     }
 
@@ -246,6 +240,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         }
 
         this.world.setGeoPosition(40.550616, -75.402740);
+        beyondarFragment.setMaxDistanceToRender(1609); //one mile
         beyondarFragment.setWorld(this.world);
         beyondarFragment.setOnTouchBeyondarViewListener(this);
     }

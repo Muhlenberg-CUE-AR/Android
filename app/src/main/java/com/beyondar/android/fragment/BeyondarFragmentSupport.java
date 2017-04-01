@@ -38,10 +38,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import boofcv.android.gui.VideoProcessing;
-import muhlenberg.edu.cue.videoprocessing.ShowGradient;
-import muhlenberg.edu.cue.videoprocessing.Visualization;
-
 /**
  * Support fragment class that displays and control the
  * {@link com.beyondar.android.view.CameraView CameraView} and the
@@ -58,7 +54,6 @@ public class BeyondarFragmentSupport extends Fragment implements FpsUpdatable, O
 
     private CameraView mBeyondarCameraView;
     private BeyondarGLSurfaceView mBeyondarGLSurface;
-    private Visualization visualization;
     private TextView mFpsTextView;
     private FrameLayout mMainLayout;
 
@@ -170,8 +165,6 @@ public class BeyondarFragmentSupport extends Fragment implements FpsUpdatable, O
     public void onResume() {
         super.onResume();
         Camera cam = mBeyondarCameraView.getCamera();
-        cam.setPreviewCallback(this.visualization);
-
         mBeyondarCameraView.startPreviewCamera();
 
         mBeyondarGLSurface.onResume();

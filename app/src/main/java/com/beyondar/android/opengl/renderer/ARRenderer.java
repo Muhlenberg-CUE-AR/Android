@@ -634,6 +634,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
      */
     protected void renderBeyondarObject(GL10 gl, BeyondarObject beyondarObject, Texture defaultTexture,
                                         long time) {
+
         boolean renderObject = false;
         Renderable renderable = beyondarObject.getOpenGLObject();
 
@@ -764,7 +765,6 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        Log.d("cueardraw", "renderer surface created");
         // Let's check the available OpenGL Extensions:
         checkGlExtensions(gl);
 
