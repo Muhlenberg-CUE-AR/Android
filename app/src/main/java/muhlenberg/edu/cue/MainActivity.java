@@ -27,17 +27,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.android.gui.VideoDisplayActivity;
+import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import muhlenberg.edu.cue.services.database.Building;
 import muhlenberg.edu.cue.services.database.CUEDatabaseService;
 import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
-import muhlenberg.edu.cue.videoprocessing.CannyEdge;
-import muhlenberg.edu.cue.videoprocessing.PolygonFitting;
+import muhlenberg.edu.cue.videoprocessing.LineDetector;
 
 /**
  * Created by Jalal on 1/28/2017.
- * TODO: try moving visualization to its own class
  */
 public class MainActivity extends VideoDisplayActivity implements LocationListener, OnTouchBeyondarViewListener {
 
@@ -79,7 +82,10 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     public void onResume() {
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
-        setProcessing(new PolygonFitting());
+        DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
+                new ConfigHoughFoot(5, 6, 5, 40, 3), GrayU8.class, GrayS16.class);
+
+        setProcessing(new LineDetector(detector));
         super.onResume();
     }
 
@@ -89,16 +95,15 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     }
 
     @Override
-    protected Camera openConfigureCamera( Camera.CameraInfo cameraInfo )
-    {
+    protected Camera openConfigureCamera(Camera.CameraInfo cameraInfo) {
         Camera mCamera = selectAndOpenCamera(cameraInfo);
         Camera.Parameters param = mCamera.getParameters();
 
         // Select the preview size closest to 320x240
         // Smaller images are recommended because some computer vision operations are very expensive
         List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-        Camera.Size s = sizes.get(closest(sizes,320,240));
-        param.setPreviewSize(s.width,s.height);
+        Camera.Size s = sizes.get(closest(sizes, 320, 240));
+        param.setPreviewSize(s.width, s.height);
         mCamera.setParameters(param);
 
         displayAllPOI();
@@ -120,7 +125,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         for (int i = 0; i < numberOfCameras; i++) {
             Camera.getCameraInfo(i, info);
 
-            if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 selected = i;
                 break;
             } else {
@@ -129,7 +134,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
             }
         }
 
-        if( selected == -1 ) {
+        if (selected == -1) {
             dialogNoCamera();
             return null; // won't ever be called
         } else {
@@ -156,18 +161,18 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     /**
      * Goes through the size list and selects the one which is the closest specified size
      */
-    public static int closest(List<Camera.Size> sizes , int width , int height ) {
+    public static int closest(List<Camera.Size> sizes, int width, int height) {
         int best = -1;
         int bestScore = Integer.MAX_VALUE;
 
-        for( int i = 0; i < sizes.size(); i++ ) {
+        for (int i = 0; i < sizes.size(); i++) {
             Camera.Size s = sizes.get(i);
 
-            int dx = s.width-width;
-            int dy = s.height-height;
+            int dx = s.width - width;
+            int dy = s.height - height;
 
-            int score = dx*dx + dy*dy;
-            if( score < bestScore ) {
+            int score = dx * dx + dy * dy;
+            if (score < bestScore) {
                 best = i;
                 bestScore = score;
             }
@@ -209,7 +214,6 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     }
 
 
-
     @Override
     public void onTouchBeyondarView(MotionEvent event, BeyondarGLSurfaceView beyondarView) {
         float x = event.getX();
@@ -219,7 +223,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
         beyondarView.getBeyondarObjectsOnScreenCoordinates(x, y, geoObjects);
         Iterator<BeyondarObject> iterator = geoObjects.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             BeyondarObject next = iterator.next();
             showPopup(next.getName());
         }
@@ -229,7 +233,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         this.world = new World(this);
         this.world.setDefaultImage(R.drawable.road_overlay);
         Building[] buildings = CUEDatabaseService.getInstance().readAllPOI();
-        for(int i=0; i<buildings.length; i++) {
+        for (int i = 0; i < buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());
             poi.setName(buildings[i].getName());
             poi.setText(buildings[i].getName());

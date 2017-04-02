@@ -29,6 +29,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
@@ -769,7 +770,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         checkGlExtensions(gl);
 
 		/*
-		 * By default, OpenGL enables features that improve quality but reduce
+         * By default, OpenGL enables features that improve quality but reduce
 		 * performance. One might want to tweak that especially on software
 		 * renderer.
 		 */
@@ -872,7 +873,6 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
      */
     public void loadBeyondarObjectTexture(GL10 gl, BeyondarObject geoObject) {
 
-        //check for cache first?
         Bitmap btm = mWorld.getBitmapCache().getBitmap(geoObject.getImageUri());
 
         if (geoObject.getText() != null && !geoObject.getText().isEmpty()) {
@@ -884,7 +884,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
             textPaint.setAntiAlias(true);
             textPaint.setARGB(0xff, 0, 0, 0);
             canvas.drawText(geoObject.getText(), btm.getWidth() / 2, btm.getHeight() / 2, textPaint);
-            btm = mutable;
+            btm = mutable.copy(mutable.getConfig(), false);
         }
 
         Texture texture = loadBitmapTexture(gl, btm, geoObject.getImageUri());
@@ -920,11 +920,8 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         Texture texture = null;
         // Check if the texture already exist
         texture = sTextureHolder.get(uri);
-        if (texture == null) {
-            texture = load2DTexture(gl, btm);
-
-            sTextureHolder.put(uri, texture);
-        }
+        texture = load2DTexture(gl, btm);
+        sTextureHolder.put(uri, texture);
         return texture.clone();
     }
 

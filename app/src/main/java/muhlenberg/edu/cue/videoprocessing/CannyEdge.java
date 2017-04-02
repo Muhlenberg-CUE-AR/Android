@@ -22,7 +22,7 @@ public class CannyEdge extends VideoImageProcessing<GrayU8> {
 
     boofcv.alg.feature.detect.edge.CannyEdge<GrayU8, GrayS16> canny;
 
-    private final float threshold = 0.4f;
+    private final float threshold = 0.1f;
     public CannyEdge() {
         super(ImageType.single(GrayU8.class));
         this.canny = FactoryEdgeDetectors.canny(2, true, true, GrayU8.class, GrayS16.class);
