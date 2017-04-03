@@ -5,11 +5,13 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -23,6 +25,9 @@ import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.google.android.gms.location.LocationListener;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,13 +39,20 @@ import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import muhlenberg.edu.cue.services.database.Building;
+import muhlenberg.edu.cue.services.database.CUEDatabaseContract;
+import muhlenberg.edu.cue.services.database.CUEDatabaseHelper;
 import muhlenberg.edu.cue.services.database.CUEDatabaseService;
+import muhlenberg.edu.cue.services.database.Tour;
 import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
+import muhlenberg.edu.cue.util.location.CUELocation;
+import muhlenberg.edu.cue.util.location.CUELocationUtils;
 import muhlenberg.edu.cue.videoprocessing.LineDetector;
+
 
 /**
  * Created by Jalal on 1/28/2017.
+ * Willy made some changes to this throughout the project
  */
 public class MainActivity extends VideoDisplayActivity implements LocationListener, OnTouchBeyondarViewListener {
 
@@ -49,6 +61,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
     private BeyondarFragment beyondarFragment;
     private World world;
+    private Tour tour;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +73,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         }
 
         CUEDatabaseService.getInstance().start(this);
-
+        // gets all the locations on a certain tour route
         getViewContent().removeAllViews();
         FrameLayout mainLayout = new FrameLayout(this);
         mainLayout.setId(100);
@@ -76,6 +89,38 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         getFragmentManager().executePendingTransactions();
 
         setShowFPS(true);
+        List<CUELocation> pointList = new ArrayList<CUELocation>();
+        this.tour = new Tour("TestTour", 0, pointList);
+        readPointList();
+
+    }
+
+    public void readPointList(){
+        BufferedReader reader = null;
+        List<CUELocation> pointList = new ArrayList<CUELocation>();
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open("TestTour.txt")));
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                String[] latlng = mLine.split(",");
+                CUELocation loc = new CUELocation(Double.parseDouble(latlng[1]), Double.parseDouble(latlng[0]));
+                pointList.add(loc);
+            }
+        } catch (IOException e) {
+            Log.d("FileNotOpened", "File was not opened correctly");
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.d("FileNotClosed", "File was not closed correctly");
+                }
+            }
+        }
+        this.tour.setPointList(pointList);
     }
 
     @Override
@@ -211,6 +256,23 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
             return;
 
         this.world.setGeoPosition(loc.getLatitude(), loc.getLongitude());
+
+        // checks to see if the user is on the path
+        CUELocation myLocation = new CUELocation(this.world.getLatitude(), this.world.getLongitude());
+        boolean isUserOnPath = isLocationOnPath(myLocation, this.tour.getPointList(), 10);
+        Log.d("OnPath", "Are you on the tour path: " + String.valueOf(isUserOnPath));
+    }
+    /*
+        Function to see if user's current position is on the designated tour path
+    */
+    public boolean isLocationOnPath(CUELocation myLocation, List<CUELocation> tour, int tolerance){
+        for(int i=0; i<tour.size(); i++){
+            Log.d("distance", Double.toString(CUELocationUtils.getDistance(myLocation, tour.get(i))));
+            if(CUELocationUtils.getDistance(myLocation, tour.get(i)) < tolerance){
+                return true;
+            }
+        }
+        return false;
     }
 
 

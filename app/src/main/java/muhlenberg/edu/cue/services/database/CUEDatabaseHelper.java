@@ -67,7 +67,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Creates table and inserts default data on first time opening the app
-     * @param db
+     * @param db (instance of the database)
      */
     public void onCreate(SQLiteDatabase db) {
         // creates tables within database
@@ -89,6 +89,8 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
         for(int i=0; i<buildings.length; i++){
             insertPOI(buildings[i], db);
         }
+
+        //readPointList("TestTour");
     }
 
     private long insertPOI(Building b, SQLiteDatabase db) {
@@ -120,26 +122,26 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
     /*
     Reads the file of points from an .txt file in the asset folder
  */
-    public void readPointListFromAsset() {
+    public void readPointList(String fileName) {
         BufferedReader reader = null;
         List<CUELocation> pointList;
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(this.context.getAssets().open("TestTour.txt")));
+                    new InputStreamReader(this.context.getAssets().open(fileName)));
 
             // do reading, usually loop until end of file reading
             String mLine;
             while ((mLine = reader.readLine()) != null) {
-                Log.d("Line Read", mLine);
+                Log.d("Line Read", "This is the line that was read: " + mLine);
             }
         } catch (IOException e) {
-            //log the exception
+            Log.e("NotRead", "The line in the file was not read correctly");
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    //log the exception
+                    Log.e("CantCloseFile", "File was not closed");
                 }
             }
         }
