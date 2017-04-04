@@ -11,9 +11,13 @@ import android.database.sqlite.SQLiteDatabase;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import muhlenberg.edu.cue.MainActivity;
 import muhlenberg.edu.cue.services.AbstractService;
+import muhlenberg.edu.cue.util.location.CUELocation;
 
 
 public class CUEDatabaseService extends AbstractService {
@@ -39,7 +43,6 @@ public class CUEDatabaseService extends AbstractService {
         if (instance == null) {
             instance = new CUEDatabaseService();
         }
-
         return instance;
     }
 
@@ -66,6 +69,41 @@ public class CUEDatabaseService extends AbstractService {
         cursor.close();
 
         return buildings;
+    }
+
+    /*
+    gets the tour (testTour right now) from the db
+     */
+    public Tour readTour() {
+        String selectQuery = "SELECT * FROM " + CUEDatabaseContract.Tour.TABLE_NAME;
+        Cursor cursor = sql.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+        Tour tour = new Tour(cursor.getString(NAME), cursor.getInt(ID), null);
+        cursor.close();
+        return tour;
+    }
+
+    /*
+    gets the pointlist for the current tour
+     */
+    public List<CUELocation> readPointList() {
+        // select the Point Table from the database
+        String selectQuery = "SELECT * FROM " + CUEDatabaseContract.Point.TABLE_NAME;
+        // create the cursor
+        Cursor cursor = sql.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+
+        // while there are points corresponding to a specific tour
+        // add them to a linked list
+        LinkedList<CUELocation> pointList = new LinkedList<CUELocation>();
+        while(cursor.moveToNext()) {
+            Double lat = cursor.getDouble(2);
+            Double lng = cursor.getDouble(3);
+            CUELocation loc = new CUELocation(lat, lng);
+            pointList.add(loc);
+        }
+        cursor.close();
+        return pointList;
     }
 
     /*

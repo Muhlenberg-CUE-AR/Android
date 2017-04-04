@@ -90,37 +90,9 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
         setShowFPS(true);
         List<CUELocation> pointList = new ArrayList<CUELocation>();
-        this.tour = new Tour("TestTour", 0, pointList);
-        readPointList();
+        this.tour = CUEDatabaseService.getInstance().readTour();
+        this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
 
-    }
-
-    public void readPointList(){
-        BufferedReader reader = null;
-        List<CUELocation> pointList = new ArrayList<CUELocation>();
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("TestTour.txt")));
-
-            // do reading, usually loop until end of file reading
-            String mLine;
-            while ((mLine = reader.readLine()) != null) {
-                String[] latlng = mLine.split(",");
-                CUELocation loc = new CUELocation(Double.parseDouble(latlng[1]), Double.parseDouble(latlng[0]));
-                pointList.add(loc);
-            }
-        } catch (IOException e) {
-            Log.d("FileNotOpened", "File was not opened correctly");
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.d("FileNotClosed", "File was not closed correctly");
-                }
-            }
-        }
-        this.tour.setPointList(pointList);
     }
 
     @Override
@@ -260,15 +232,16 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         // checks to see if the user is on the path
         CUELocation myLocation = new CUELocation(this.world.getLatitude(), this.world.getLongitude());
         boolean isUserOnPath = isLocationOnPath(myLocation, this.tour.getPointList(), 10);
-        Log.d("OnPath", "Are you on the tour path: " + String.valueOf(isUserOnPath));
+        //Toast.makeText(this, "Are you on the tour path: " + String.valueOf(isUserOnPath), Toast.LENGTH_SHORT).show();
+        //Log.d("OnPath", "Are you on the tour path: " + String.valueOf(isUserOnPath));
     }
     /*
         Function to see if user's current position is on the designated tour path
     */
     public boolean isLocationOnPath(CUELocation myLocation, List<CUELocation> tour, int tolerance){
         for(int i=0; i<tour.size(); i++){
-            Log.d("distance", Double.toString(CUELocationUtils.getDistance(myLocation, tour.get(i))));
-            if(CUELocationUtils.getDistance(myLocation, tour.get(i)) < tolerance){
+            Double locationDifference = CUELocationUtils.getDistance(myLocation, tour.get(i));
+            if(locationDifference < tolerance){
                 return true;
             }
         }
