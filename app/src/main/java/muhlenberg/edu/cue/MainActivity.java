@@ -5,11 +5,13 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -23,21 +25,34 @@ import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.google.android.gms.location.LocationListener;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.android.gui.VideoDisplayActivity;
+import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import muhlenberg.edu.cue.services.database.Building;
+import muhlenberg.edu.cue.services.database.CUEDatabaseContract;
+import muhlenberg.edu.cue.services.database.CUEDatabaseHelper;
 import muhlenberg.edu.cue.services.database.CUEDatabaseService;
+import muhlenberg.edu.cue.services.database.Tour;
 import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
-import muhlenberg.edu.cue.videoprocessing.CannyEdge;
-import muhlenberg.edu.cue.videoprocessing.PolygonFitting;
+import muhlenberg.edu.cue.util.location.CUELocation;
+import muhlenberg.edu.cue.util.location.CUELocationUtils;
+import muhlenberg.edu.cue.videoprocessing.LineDetector;
+
 
 /**
  * Created by Jalal on 1/28/2017.
- * TODO: try moving visualization to its own class
+ * Willy made some changes to this throughout the project
  */
 public class MainActivity extends VideoDisplayActivity implements LocationListener, OnTouchBeyondarViewListener {
 
@@ -46,6 +61,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
     private BeyondarFragment beyondarFragment;
     private World world;
+    private Tour tour;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +73,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         }
 
         CUEDatabaseService.getInstance().start(this);
-
+        // gets all the locations on a certain tour route
         getViewContent().removeAllViews();
         FrameLayout mainLayout = new FrameLayout(this);
         mainLayout.setId(100);
@@ -73,13 +89,20 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         getFragmentManager().executePendingTransactions();
 
         setShowFPS(true);
+        List<CUELocation> pointList = new ArrayList<CUELocation>();
+        this.tour = CUEDatabaseService.getInstance().readTour();
+        this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
+
     }
 
     @Override
     public void onResume() {
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
-        setProcessing(new PolygonFitting());
+        DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
+                new ConfigHoughFoot(5, 6, 5, 40, 3), GrayU8.class, GrayS16.class);
+
+        setProcessing(new LineDetector(detector));
         super.onResume();
     }
 
@@ -89,16 +112,15 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     }
 
     @Override
-    protected Camera openConfigureCamera( Camera.CameraInfo cameraInfo )
-    {
+    protected Camera openConfigureCamera(Camera.CameraInfo cameraInfo) {
         Camera mCamera = selectAndOpenCamera(cameraInfo);
         Camera.Parameters param = mCamera.getParameters();
 
         // Select the preview size closest to 320x240
         // Smaller images are recommended because some computer vision operations are very expensive
         List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-        Camera.Size s = sizes.get(closest(sizes,320,240));
-        param.setPreviewSize(s.width,s.height);
+        Camera.Size s = sizes.get(closest(sizes, 320, 240));
+        param.setPreviewSize(s.width, s.height);
         mCamera.setParameters(param);
 
         displayAllPOI();
@@ -120,7 +142,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         for (int i = 0; i < numberOfCameras; i++) {
             Camera.getCameraInfo(i, info);
 
-            if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 selected = i;
                 break;
             } else {
@@ -129,7 +151,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
             }
         }
 
-        if( selected == -1 ) {
+        if (selected == -1) {
             dialogNoCamera();
             return null; // won't ever be called
         } else {
@@ -156,18 +178,18 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     /**
      * Goes through the size list and selects the one which is the closest specified size
      */
-    public static int closest(List<Camera.Size> sizes , int width , int height ) {
+    public static int closest(List<Camera.Size> sizes, int width, int height) {
         int best = -1;
         int bestScore = Integer.MAX_VALUE;
 
-        for( int i = 0; i < sizes.size(); i++ ) {
+        for (int i = 0; i < sizes.size(); i++) {
             Camera.Size s = sizes.get(i);
 
-            int dx = s.width-width;
-            int dy = s.height-height;
+            int dx = s.width - width;
+            int dy = s.height - height;
 
-            int score = dx*dx + dy*dy;
-            if( score < bestScore ) {
+            int score = dx * dx + dy * dy;
+            if (score < bestScore) {
                 best = i;
                 bestScore = score;
             }
@@ -206,8 +228,25 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
             return;
 
         this.world.setGeoPosition(loc.getLatitude(), loc.getLongitude());
-    }
 
+        // checks to see if the user is on the path
+        CUELocation myLocation = new CUELocation(this.world.getLatitude(), this.world.getLongitude());
+        boolean isUserOnPath = isLocationOnPath(myLocation, this.tour.getPointList(), 10);
+        Toast.makeText(this, "Are you on the tour path: " + String.valueOf(isUserOnPath), Toast.LENGTH_SHORT).show();
+        //Log.d("OnPath", "Are you on the tour path: " + String.valueOf(isUserOnPath));
+    }
+    /*
+        Function to see if user's current position is on the designated tour path
+    */
+    public boolean isLocationOnPath(CUELocation myLocation, List<CUELocation> tour, int tolerance){
+        for(int i=0; i<tour.size(); i++){
+            Double locationDifference = CUELocationUtils.getDistance(myLocation, tour.get(i));
+            if(locationDifference < tolerance){
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     @Override
@@ -219,7 +258,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
         beyondarView.getBeyondarObjectsOnScreenCoordinates(x, y, geoObjects);
         Iterator<BeyondarObject> iterator = geoObjects.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             BeyondarObject next = iterator.next();
             showPopup(next.getName());
         }
@@ -229,7 +268,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         this.world = new World(this);
         this.world.setDefaultImage(R.drawable.road_overlay);
         Building[] buildings = CUEDatabaseService.getInstance().readAllPOI();
-        for(int i=0; i<buildings.length; i++) {
+        for (int i = 0; i < buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());
             poi.setName(buildings[i].getName());
             //System.out.println(buildings[i].getName());

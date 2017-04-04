@@ -770,7 +770,7 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         checkGlExtensions(gl);
 
 		/*
-		 * By default, OpenGL enables features that improve quality but reduce
+         * By default, OpenGL enables features that improve quality but reduce
 		 * performance. One might want to tweak that especially on software
 		 * renderer.
 		 */
@@ -923,11 +923,8 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         Texture texture = null;
         // Check if the texture already exist
         texture = sTextureHolder.get(uri);
-        if (texture == null) {
-            texture = load2DTexture(gl, btm);
-
-            sTextureHolder.put(uri, texture);
-        }
+        texture = load2DTexture(gl, btm);
+        sTextureHolder.put(uri, texture);
         return texture.clone();
     }
 
