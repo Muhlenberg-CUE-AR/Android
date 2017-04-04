@@ -232,8 +232,10 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         for(int i=0; i<buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());
             poi.setName(buildings[i].getName());
-            poi.setText(buildings[i].getName());
-            poi.setImageResource(R.drawable.base_poi_background);
+            //System.out.println(buildings[i].getName());
+            poi.setText(buildings[i].getName(), buildings[i].getShortDesc());
+            int resource = getResources().getIdentifier("base_poi_background" + i, "drawable", getPackageName());
+            poi.setImageResource(resource);
             poi.setGeoPosition(buildings[i].getLat(), buildings[i].getLng());
 
             this.world.addBeyondarObject(poi);
@@ -243,6 +245,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         beyondarFragment.setMaxDistanceToRender(1609); //one mile
         beyondarFragment.setWorld(this.world);
         beyondarFragment.setOnTouchBeyondarViewListener(this);
+        beyondarFragment.setDistanceFactor(10);
     }
 
     private void showPopup(String text) {

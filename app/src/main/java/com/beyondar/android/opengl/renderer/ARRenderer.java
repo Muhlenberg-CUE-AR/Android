@@ -29,6 +29,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
@@ -875,15 +876,17 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         //check for cache first?
         Bitmap btm = mWorld.getBitmapCache().getBitmap(geoObject.getImageUri());
 
-        if (geoObject.getText() != null && !geoObject.getText().isEmpty()) {
+        if (geoObject.getText() != null && !geoObject.getText()[0].isEmpty() && !geoObject.getText()[1].isEmpty()) {
             Bitmap mutable = btm.copy(btm.getConfig(), true);
             Canvas canvas = new Canvas(mutable);
 
             Paint textPaint = new Paint();
             textPaint.setTextSize(72);
             textPaint.setAntiAlias(true);
-            textPaint.setARGB(0xff, 0, 0, 0);
-            canvas.drawText(geoObject.getText(), btm.getWidth() / 2, btm.getHeight() / 2, textPaint);
+            textPaint.setARGB(0xff, 0, 153, 204);
+            textPaint.setShadowLayer(5, 2, 2, Color.BLACK);
+            canvas.drawText(geoObject.getText()[0], btm.getWidth() / (float)15, btm.getHeight() / (float)2.5, textPaint);
+            canvas.drawText(geoObject.getText()[1], btm.getWidth() / (float)15, btm.getHeight() / (float)1.4, textPaint);
             btm = mutable;
         }
 

@@ -47,7 +47,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
                     CUEDatabaseContract.Point.COLUMN_NAME_ORDER_NUMBER + " INTEGER," +
                     CUEDatabaseContract.Point.COLUMN_NAME_LATITUDE + " TEXT," +
                     CUEDatabaseContract.Point.COLUMN_NAME_LONGITUDE + " TEXT," +
-                        "FOREIGN KEY (TOUR_ID) REFERENCES TOUR(_ID)";
+                        "FOREIGN KEY (TOUR_ID) REFERENCES TOUR(_ID))";
 
 
     //Used to remove the table when needed
@@ -79,12 +79,12 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
         Building[] buildings = new Building[6];
 
         // creates building objects to be stored in an array
-        buildings[0] = new Building(-1, "Trumbower", "Building", "Math and Science", 40.597450f, -75.510855f);
-        buildings[1] = new Building(-1, "Hass", "Building", "College Offices", 40.597629f, -75.510136f);
-        buildings[2] = new Building(-1, "New Science", "Building", "New Science Building", 40.597207f, -75.511698f);
-        buildings[3] = new Building(-1, "Ettinger", "Building", "Business and History", 40.597804f, -75.509426f);
-        buildings[4] = new Building(-1, "Moyer", "Building", "Useless Majors", 40.597930f, -75.508640f);
-        buildings[5] = new Building(-1, "Life Sports Center", "Building", "Gym", 40.599069f, -75.509579f);
+        buildings[0] = new Building(-1, "Trumbower", "Math and Science", "", 40.597450f, -75.510855f);
+        buildings[1] = new Building(-1, "Haas", "College Offices", "", 40.597629f, -75.510136f);
+        buildings[2] = new Building(-1, "New Science", "New Science Building", "", 40.597207f, -75.511698f);
+        buildings[3] = new Building(-1, "Ettinger", "Business and History", "", 40.597804f, -75.509426f);
+        buildings[4] = new Building(-1, "Moyer", "Useless Majors", "", 40.597930f, -75.508640f);
+        buildings[5] = new Building(-1, "Life Sports Center", "Gym", "", 40.599069f, -75.509579f);
 
         for(int i=0; i<buildings.length; i++){
             insertPOI(buildings[i], db);
