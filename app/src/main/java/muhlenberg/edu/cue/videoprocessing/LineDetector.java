@@ -1,6 +1,7 @@
 package muhlenberg.edu.cue.videoprocessing;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -109,12 +110,6 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
 //            }
             canvas.drawPath(path, roadPaint);
         }
-
-    }
-
-    @Override
-    public void convertPreview(byte[] bytes, Camera camera) {
-        super.convertPreview(bytes, camera);
 
     }
 }
