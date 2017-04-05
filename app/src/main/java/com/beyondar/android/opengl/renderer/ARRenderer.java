@@ -34,6 +34,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -879,14 +880,38 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
         if (geoObject.getText() != null && !geoObject.getText()[0].isEmpty() && !geoObject.getText()[1].isEmpty()) {
             Bitmap mutable = btm.copy(btm.getConfig(), true);
             Canvas canvas = new Canvas(mutable);
+            float size;
 
             Paint textPaint = new Paint();
-            textPaint.setTextSize(72);
+            Rect boundsName = new Rect();
+            Rect boundsDesc = new Rect();
             textPaint.setAntiAlias(true);
             textPaint.setARGB(0xff, 0, 153, 204);
             textPaint.setShadowLayer(5, 2, 2, Color.BLACK);
+
+            textPaint.setTextSize(72);
+            textPaint.getTextBounds(geoObject.getText()[0], 0, geoObject.getText()[0].length(), boundsName);
+            size = 300.0f / boundsName.width() * 72.0f;
+            if (size > 88){
+                size = 88;
+            }
+            else if (size < 50) {
+                size = size * 1.25f;
+            }
+            textPaint.setTextSize(size);
             canvas.drawText(geoObject.getText()[0], btm.getWidth() / (float)15, btm.getHeight() / (float)2.5, textPaint);
+            textPaint.setTextSize(72);
+            textPaint.getTextBounds(geoObject.getText()[1], 0, geoObject.getText()[1].length(), boundsDesc);
+            size = 300.0f / boundsDesc.width() * 72.0f;
+            if (size > 88){
+                size = 88;
+            }
+            else if (size < 50) {
+                size = size * 1.25f;
+            }
+            textPaint.setTextSize(size);
             canvas.drawText(geoObject.getText()[1], btm.getWidth() / (float)15, btm.getHeight() / (float)1.4, textPaint);
+
             btm = mutable;
         }
 
