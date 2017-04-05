@@ -14,8 +14,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.List;
+
 import muhlenberg.edu.cue.MainActivity;
 import muhlenberg.edu.cue.services.AbstractService;
+import muhlenberg.edu.cue.util.location.CUELocation;
+import muhlenberg.edu.cue.util.location.CUELocationUtils;
 
 /**
  * Created by Jalal on 1/28/2017.
@@ -141,4 +145,18 @@ public class CUELocationService extends AbstractService {
         locationRequest.setFastestInterval(5000);
         return locationRequest;
     }
+
+    /*
+    Function to see if user's current position is on the designated tour path
+    */
+    public static boolean isLocationOnPath(CUELocation myLocation, List<CUELocation> tour, int tolerance){
+        for(int i=0; i<tour.size(); i++){
+            Double locationDifference = CUELocationUtils.getDistance(myLocation, tour.get(i));
+            if(locationDifference < tolerance){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

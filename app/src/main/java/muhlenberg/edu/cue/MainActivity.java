@@ -5,13 +5,11 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -25,9 +23,6 @@ import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.google.android.gms.location.LocationListener;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,8 +34,6 @@ import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import muhlenberg.edu.cue.services.database.Building;
-import muhlenberg.edu.cue.services.database.CUEDatabaseContract;
-import muhlenberg.edu.cue.services.database.CUEDatabaseHelper;
 import muhlenberg.edu.cue.services.database.CUEDatabaseService;
 import muhlenberg.edu.cue.services.database.Tour;
 import muhlenberg.edu.cue.services.location.CUELocationService;
@@ -89,7 +82,6 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         getFragmentManager().executePendingTransactions();
 
         setShowFPS(true);
-        List<CUELocation> pointList = new ArrayList<CUELocation>();
         this.tour = CUEDatabaseService.getInstance().readTour();
         this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
 
@@ -100,7 +92,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
         DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
-                new ConfigHoughFoot(5, 6, 5, 40, 3), GrayU8.class, GrayS16.class);
+                new ConfigHoughFoot(10, 6, 5, 30, 2), GrayU8.class, GrayS16.class);
 
         setProcessing(new LineDetector(detector));
         super.onResume();
@@ -231,21 +223,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
         // checks to see if the user is on the path
         CUELocation myLocation = new CUELocation(this.world.getLatitude(), this.world.getLongitude());
-        boolean isUserOnPath = isLocationOnPath(myLocation, this.tour.getPointList(), 10);
-        Toast.makeText(this, "Are you on the tour path: " + String.valueOf(isUserOnPath), Toast.LENGTH_SHORT).show();
-        //Log.d("OnPath", "Are you on the tour path: " + String.valueOf(isUserOnPath));
-    }
-    /*
-        Function to see if user's current position is on the designated tour path
-    */
-    public boolean isLocationOnPath(CUELocation myLocation, List<CUELocation> tour, int tolerance){
-        for(int i=0; i<tour.size(); i++){
-            Double locationDifference = CUELocationUtils.getDistance(myLocation, tour.get(i));
-            if(locationDifference < tolerance){
-                return true;
-            }
-        }
-        return false;
+        CUELocationService.isLocationOnPath(myLocation, this.tour.getPointList(), 10);
     }
 
 
@@ -292,4 +270,5 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         CUEPopup.text = text;
         newFragment.show(getFragmentManager(), "dialog");
     }
+
 }
