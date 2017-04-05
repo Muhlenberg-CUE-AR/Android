@@ -892,11 +892,11 @@ public class ARRenderer implements GLSurfaceView.Renderer, BeyondarSensorListene
             textPaint.setTextSize(72);
             textPaint.getTextBounds(geoObject.getText()[0], 0, geoObject.getText()[0].length(), boundsName);
             size = 300.0f / boundsName.width() * 72.0f;
-            if (size > 100){
-                size = 100;
+            if (size > 88){
+                size = 88;
             }
             else if (size < 50) {
-                size = 50;
+                size = size * 1.25f;
             }
             textPaint.setTextSize(size);
             canvas.drawText(geoObject.getText()[0], btm.getWidth() / (float)15, btm.getHeight() / (float)2.5, textPaint);
