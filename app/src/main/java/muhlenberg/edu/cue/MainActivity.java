@@ -269,6 +269,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         beyondarFragment.setWorld(this.world);
         beyondarFragment.setOnTouchBeyondarViewListener(this);
         beyondarFragment.setDistanceFactor(10);
+        beyondarFragment.setPushAwayDistance(10);
     }
 
     private void showPopup(String text) {
