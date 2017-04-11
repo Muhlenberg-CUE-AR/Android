@@ -12,7 +12,9 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import muhlenberg.edu.cue.MainActivity;
 import muhlenberg.edu.cue.util.location.CUELocation;
@@ -77,16 +79,19 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_TOUR_TABLE);
         db.execSQL(SQL_CREATE_POINT_TABLE);
 
+        // gets long descriptions from asset file
+        Map<Integer, String> longDescs = readLongDescFromAsset();
+
         // inserts buildings into the database
         Building[] buildings = new Building[6];
 
         // creates building objects to be stored in an array
-        buildings[0] = new Building(-1, "Trumbower", "Math and Science", "", 40.597450f, -75.510855f);
-        buildings[1] = new Building(-1, "Haas", "College Offices", "", 40.597629f, -75.510136f);
-        buildings[2] = new Building(-1, "New Science", "New Science Building", "", 40.597207f, -75.511698f);
-        buildings[3] = new Building(-1, "Ettinger", "Business and History", "", 40.597804f, -75.509426f);
-        buildings[4] = new Building(-1, "Moyer", "Useless Majors", "", 40.597930f, -75.508640f);
-        buildings[5] = new Building(-1, "Life Sports Center", "Gym", "", 40.599069f, -75.509579f);
+        buildings[0] = new Building(-1, "Trumbower", "Math and Science", longDescs.get(0), 40.597450f, -75.510855f);
+        buildings[1] = new Building(-1, "Haas", "College Offices", longDescs.get(1), 40.597629f, -75.510136f);
+        buildings[2] = new Building(-1, "New Science", "New Science Building", longDescs.get(2), 40.597207f, -75.511698f);
+        buildings[3] = new Building(-1, "Ettinger", "Business and History", longDescs.get(3), 40.597804f, -75.509426f);
+        buildings[4] = new Building(-1, "Moyer", "Useless Majors", longDescs.get(4), 40.597930f, -75.508640f);
+        buildings[5] = new Building(-1, "Life Sports Center", "Gym", longDescs.get(5), 40.599069f, -75.509579f);
 
         for(int i=0; i<buildings.length; i++){
             insertPOI(buildings[i], db);
@@ -148,7 +153,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
 
     /*
     Reads the file of points from an .txt file in the asset folder
- */
+    */
     public List<CUELocation> readPointList(String fileName){
         BufferedReader reader = null;
         List<CUELocation> pointList = new ArrayList<CUELocation>();
@@ -158,10 +163,14 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
 
             // do reading, usually loop until end of file reading
             String mLine;
+            int count = 0;  // counter to read only every fifth tour point
             while ((mLine = reader.readLine()) != null) {
-                String[] latlng = mLine.split(",");
-                CUELocation loc = new CUELocation(Double.parseDouble(latlng[1]), Double.parseDouble(latlng[0]));
-                pointList.add(loc);
+                if(count % 5 == 0) {
+                    String[] latlng = mLine.split(",");
+                    CUELocation loc = new CUELocation(Double.parseDouble(latlng[1]), Double.parseDouble(latlng[0]));
+                    pointList.add(loc);
+                }
+                count++;
             }
         } catch (IOException e) {
             Log.d("FileNotOpened", "File was not opened correctly");
@@ -175,5 +184,34 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return pointList;
+    }
+
+    /*
+    function to read the building long descriptions from an asset file
+     */
+    public Map<Integer, String> readLongDescFromAsset() {
+        Map<Integer,String> longDescs = new HashMap<Integer, String>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(this.context.getAssets().open("LongDescriptions.txt")));
+            String mLine;
+            int index = 0; // index for the hashmap
+            while((mLine = reader.readLine()) != null){
+                longDescs.put(index, mLine);
+                index++;
+            }
+        } catch (IOException e) {
+            Log.d("FileNotOpened", "File was not opened correctly");
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.d("FileNotClosed", "File was not closed correctly");
+                }
+            }
+        }
+        return longDescs;
     }
 }
