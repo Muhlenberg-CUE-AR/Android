@@ -23,11 +23,10 @@ public class ShowGradient extends VideoImageProcessing<GrayU8> {
     private GrayS16 derivY = new GrayS16(1, 1);
 
     // computes the image gradient
-    private ImageGradient<GrayU8, GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
+    private ImageGradient<GrayU8, GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
 
     public ShowGradient() {
         super(ImageType.single(GrayU8.class));
-        Log.d("cuear", "new showgradient created");
     }
     /**
      * Constructor

@@ -1,20 +1,27 @@
 package muhlenberg.edu.cue.videoprocessing;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 
 import org.ddogleg.struct.FastQueue;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import boofcv.abst.feature.detect.line.DetectLine;
+import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
@@ -32,9 +39,11 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
 
     private Bitmap bitmap;
     private byte[] storage;
+    private static Bitmap cam;
     private Paint paint = new Paint();
-    private Paint roadPaint = new Paint();
-    private boolean road = false;
+
+    public final static boolean DEBUG = false;
+    private CannyEdge<GrayU8, GrayS16> canny;
 
     public LineDetector(DetectLine<GrayU8> detector) {
         super(ImageType.single(GrayU8.class));
@@ -44,8 +53,7 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2.0f);
 
-        roadPaint.setColor(Color.argb(75, 0, 0, 200));
-        roadPaint.setStyle(Paint.Style.FILL);
+        this.canny = FactoryEdgeDetectors.canny(5, true, true, GrayU8.class, GrayS16.class);
     }
 
     @Override
@@ -59,62 +67,50 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
     @Override
     protected void process(GrayU8 gray) {
         if (detector != null) {
+            canny.process(gray, 0.1f, 0.3f, null);
+            VisualizeImageData.drawEdgeContours(canny.getContours(), 0xFF0000, bitmap, storage);
+            ConvertBitmap.bitmapToGray(bitmap, gray, null);
             List<LineParametric2D_F32> found = detector.detect(gray);
 
             synchronized (lockGui) {
                 ConvertBitmap.grayToBitmap(gray, bitmap, storage);
+
                 lines.reset();
                 for (LineParametric2D_F32 p : found) {
                     LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width, gray.height);
                     lines.grow().set(ls.a, ls.b);
                 }
-
-                if(lines.size() == 2) {
-                    float slope1 = lines.get(0).slopeY()/lines.get(0).slopeX();
-                    float slope2 = lines.get(1).slopeY()/lines.get(1).slopeX();
-
-                    //angle is in radians
-                    double angle = Math.PI - Math.abs(Math.atan(slope1) - Math.atan(slope2));
-
-                    //some threshold  value in radians (45 deg)
-                    //if true, we have a road
-                    if(angle <= Math.PI/4.0) {
-                        road = true;
-                    }
-                    else {
-                        road = false;
-                    }
-                }
             }
         }
     }
 
+
     @Override
     protected void render(Canvas canvas, double imageToOutput) {
-        canvas.drawBitmap(bitmap, 0, 0, null);
+        if(cam != null && !DEBUG)
+            canvas.drawBitmap(cam, 0, 0, null);
+        else
+            canvas.drawBitmap(bitmap, 0, 0, null);
 
-        if(road) {
-            Path path = new Path();
-            LineSegment2D_F32 a = lines.toList().get(0);
-            LineSegment2D_F32 b = lines.toList().get(1);
-
-            path.moveTo(a.a.x, a.a.y);
-            path.lineTo(a.b.x, a.b.y);
-            path.lineTo(b.b.x, b.b.y);
-            path.lineTo(b.a.x, b.a.y);
-            path.close();
-
-//            for (LineSegment2D_F32 s : lines.toList()) {
-//                canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
-//            }
-            canvas.drawPath(path, roadPaint);
+        for (LineSegment2D_F32 s : lines.toList()) {
+            canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
         }
-
     }
 
     @Override
     public void convertPreview(byte[] bytes, Camera camera) {
-        super.convertPreview(bytes, camera);
+        Camera.Parameters parameters = camera.getParameters();
+        int width = parameters.getPreviewSize().width;
+        int height = parameters.getPreviewSize().height;
 
+        YuvImage yuv = new YuvImage(bytes, parameters.getPreviewFormat(), width, height, null);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        yuv.compressToJpeg(new Rect(0, 0, width, height), 50, out);
+
+        byte[] b = out.toByteArray();
+        cam = BitmapFactory.decodeByteArray(b, 0, b.length);
+
+        super.convertPreview(bytes, camera);
     }
 }

@@ -5,6 +5,10 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,6 +27,7 @@ import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.google.android.gms.location.LocationListener;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +35,7 @@ import java.util.List;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.android.gui.VideoDisplayActivity;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -39,7 +45,6 @@ import muhlenberg.edu.cue.services.database.Tour;
 import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
 import muhlenberg.edu.cue.util.location.CUELocation;
-import muhlenberg.edu.cue.util.location.CUELocationUtils;
 import muhlenberg.edu.cue.videoprocessing.LineDetector;
 
 
@@ -91,10 +96,11 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     public void onResume() {
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
-        DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
-                new ConfigHoughFoot(10, 6, 5, 30, 2), GrayU8.class, GrayS16.class);
 
+        DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
+                new ConfigHoughFoot(5, 5, 5, 30, 2), GrayU8.class, GrayS16.class);
         setProcessing(new LineDetector(detector));
+
         super.onResume();
     }
 
