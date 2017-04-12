@@ -5,7 +5,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 
@@ -41,6 +43,8 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
     private byte[] storage;
     private static Bitmap cam;
     private Paint paint = new Paint();
+    private Paint road = new Paint();
+
 
     public final static boolean DEBUG = false;
     private CannyEdge<GrayU8, GrayS16> canny;
@@ -52,6 +56,9 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2.0f);
+
+        road.setStyle(Paint.Style.FILL);
+        road.setColor(Color.argb(30, 0, 0, 200));
 
         this.canny = FactoryEdgeDetectors.canny(5, true, true, GrayU8.class, GrayS16.class);
     }
@@ -87,13 +94,45 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
 
     @Override
     protected void render(Canvas canvas, double imageToOutput) {
-        if(cam != null && !DEBUG)
+        if (cam != null && !DEBUG)
             canvas.drawBitmap(cam, 0, 0, null);
         else
             canvas.drawBitmap(bitmap, 0, 0, null);
 
-        for (LineSegment2D_F32 s : lines.toList()) {
-            canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
+        if (lines.toList().isEmpty() || lines.size() < 2)
+            return;
+
+        LineSegment2D_F32 l1 = lines.get(0);
+        LineSegment2D_F32 l2 = lines.get(1);
+        Path path = new Path();
+        path.moveTo(l1.a.x, l1.a.y);
+        path.lineTo(l1.b.x, l1.b.y);
+        path.lineTo(l2.a.x, l2.a.y);
+        path.close();
+
+        RectF rb = new RectF();
+        path.computeBounds(rb, false);
+
+        Bitmap subregion = Bitmap.createBitmap(bitmap,(int) rb.left, (int)rb.top, (int)rb.width(), (int)rb.height());
+        Bitmap scaled = Bitmap.createScaledBitmap(subregion, 1, 1, false);
+        int color = scaled.getPixel(0 ,0);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+
+        for(int i=0; i<subregion.getWidth(); i++) {
+            for(int j=0; j<subregion.getHeight(); j++) {
+                if(subregion.getPixel(i, j) <= Color.rgb(r,g,b)+25) {
+                    subregion.setPixel(i,j,road.getColor());
+                }
+            }
+        }
+
+        canvas.drawBitmap(subregion, (int)rb.left, (int)rb.top, null);
+        if (DEBUG) {
+            for (LineSegment2D_F32 s : lines.toList()) {
+                canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
+            }
         }
     }
 
@@ -112,5 +151,7 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         cam = BitmapFactory.decodeByteArray(b, 0, b.length);
 
         super.convertPreview(bytes, camera);
+
     }
+
 }
