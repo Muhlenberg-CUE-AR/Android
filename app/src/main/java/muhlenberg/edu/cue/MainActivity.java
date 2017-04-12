@@ -71,7 +71,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         }
 
         CUEDatabaseService.getInstance().start(this);
-        // gets all the locations on a certain tour route
+
         getViewContent().removeAllViews();
         FrameLayout mainLayout = new FrameLayout(this);
         mainLayout.setId(100);
@@ -87,8 +87,6 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         getFragmentManager().executePendingTransactions();
 
         setShowFPS(true);
-        this.tour = CUEDatabaseService.getInstance().readTour();
-        this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
 
     }
 
@@ -96,6 +94,10 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     public void onResume() {
         CUELocationService.getInstance(this).start(this);
         CUEDatabaseService.getInstance().start(this);
+
+        // gets all the locations on a certain tour route
+        this.tour = CUEDatabaseService.getInstance().readTour();
+        this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
 
         DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
                 new ConfigHoughFoot(5, 5, 5, 30, 2), GrayU8.class, GrayS16.class);
@@ -255,7 +257,6 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         for (int i = 0; i < buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());
             poi.setName(buildings[i].getName());
-            //System.out.println(buildings[i].getName());
             poi.setText(buildings[i].getName(), buildings[i].getShortDesc());
             int resource = getResources().getIdentifier("base_poi_background" + i, "drawable", getPackageName());
             poi.setImageResource(resource);
