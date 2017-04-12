@@ -31,6 +31,7 @@ public class GeoObject extends BeyondarObject {
 	private double mLongitude;
 	private double mLatitude;
 	private double mAltitude;
+	private long db_id;
 
 	/**
 	 * Create an instance of a {@link com.beyondar.android.world.GeoObject
@@ -150,5 +151,13 @@ public class GeoObject extends BeyondarObject {
 	 */
 	public double calculateDistanceMeters(double longitude, double latitude) {
 		return Distance.calculateDistanceMeters(getLongitude(), getLatitude(), longitude, latitude);
+	}
+
+	public void setDBID(long id) {
+		this.db_id = id;
+	}
+
+	public long getDBID() {
+		return this.db_id;
 	}
 }

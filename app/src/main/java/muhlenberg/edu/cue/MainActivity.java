@@ -29,6 +29,7 @@ import com.google.android.gms.location.LocationListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,6 +47,8 @@ import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
 import muhlenberg.edu.cue.util.location.CUELocation;
 import muhlenberg.edu.cue.videoprocessing.LineDetector;
+
+import static android.app.DialogFragment.STYLE_NO_FRAME;
 
 
 /**
@@ -235,28 +238,31 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
 
     @Override
     public void onTouchBeyondarView(MotionEvent event, BeyondarGLSurfaceView beyondarView) {
+        HashMap<Long, Building> buildings = CUEDatabaseService.getInstance().readAllPOIasMap();
         float x = event.getX();
         float y = event.getY();
 
-        ArrayList<BeyondarObject> geoObjects = new ArrayList<BeyondarObject>();
-
+        ArrayList<BeyondarObject> geoObjects = new ArrayList<>();
         beyondarView.getBeyondarObjectsOnScreenCoordinates(x, y, geoObjects);
-        Iterator<BeyondarObject> iterator = geoObjects.iterator();
-        while (iterator.hasNext()) {
-            BeyondarObject next = iterator.next();
-            showPopup(next.getName());
+
+        Iterator<BeyondarObject> it = geoObjects.iterator();
+        while(it.hasNext()) {
+            Building next = buildings.get(it.next().getId());
+            showPopup(next.getName(), next.getLongDesc());
         }
+
     }
 
     private void displayAllPOI() {
         this.world = new World(this);
         this.world.setDefaultImage(R.drawable.road_overlay);
         Building[] buildings = CUEDatabaseService.getInstance().readAllPOI();
+
         for (int i = 0; i < buildings.length; i++) {
             GeoObject poi = new GeoObject(buildings[i].getId());
             poi.setName(buildings[i].getName());
-            //System.out.println(buildings[i].getName());
             poi.setText(buildings[i].getName(), buildings[i].getShortDesc());
+            poi.setDBID(buildings[i].getId());
             int resource = getResources().getIdentifier("base_poi_background" + i, "drawable", getPackageName());
             poi.setImageResource(resource);
             poi.setGeoPosition(buildings[i].getLat(), buildings[i].getLng());
@@ -272,10 +278,11 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         beyondarFragment.setPushAwayDistance(10);
     }
 
-    private void showPopup(String text) {
+    private void showPopup(String name, String longDesc) {
         DialogFragment newFragment = CUEPopup.newInstance();
-        CUEPopup.text = text;
+        CUEPopup.text =  name + "\n\n" + longDesc;
         newFragment.show(getFragmentManager(), "dialog");
+
     }
 
 }
