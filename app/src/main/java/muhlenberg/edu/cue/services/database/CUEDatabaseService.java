@@ -7,11 +7,13 @@ package muhlenberg.edu.cue.services.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -70,6 +72,18 @@ public class CUEDatabaseService extends AbstractService {
 
         return buildings;
     }
+
+    public HashMap<Long, Building> readAllPOIasMap() {
+        Building[] buildings = readAllPOI();
+        HashMap<Long, Building> map = new HashMap<Long, Building>();
+        for(int i=0; i<buildings.length; i++) {
+            map.put(buildings[i].getId(), buildings[i]);
+            Log.d("cuear", "building name: " + buildings[i].getName() + " id: " + buildings[i].getId());
+        }
+
+        return map;
+    }
+
 
     /*
     gets the tour (testTour right now) from the db
