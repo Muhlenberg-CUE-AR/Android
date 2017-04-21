@@ -101,7 +101,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         CUEDatabaseService.getInstance().start(this);
 
         DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
-                new ConfigHoughFoot(5, 5, 5, 30, 2), GrayU8.class, GrayS16.class);
+                new ConfigHoughFoot(5, 5, 5, 30, 5), GrayU8.class, GrayS16.class);
         setProcessing(new LineDetector(detector));
 
         super.onResume();

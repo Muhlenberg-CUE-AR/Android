@@ -12,11 +12,13 @@ import android.hardware.Camera;
 import org.ddogleg.struct.FastQueue;
 
 import java.io.ByteArrayOutputStream;
+import java.util.LinkedList;
 import java.util.List;
 
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.line.LineImageOps;
+import boofcv.alg.filter.basic.GrayImageOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
@@ -34,7 +36,6 @@ import georegression.struct.line.LineSegment2D_F32;
 public class LineDetector extends VideoRenderProcessing<GrayU8> {
 
     private DetectLine<GrayU8> detector;
-
     private FastQueue<LineSegment2D_F32> lines = new FastQueue<>(LineSegment2D_F32.class, true);
 
     private Bitmap bitmap;
@@ -42,7 +43,9 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
     private static Bitmap cam;
     private Paint paint = new Paint();
 
-    public final static boolean DEBUG = false;
+    public final static boolean DEBUG = true;
+    private final double ANGLE_TOLERANCE = 15; //in degrees
+    private final double DESIRED_ANGLE = 25; //in degrees
     private CannyEdge<GrayU8, GrayS16> canny;
 
     public LineDetector(DetectLine<GrayU8> detector) {
@@ -53,7 +56,7 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2.0f);
 
-        this.canny = FactoryEdgeDetectors.canny(5, true, true, GrayU8.class, GrayS16.class);
+        this.canny = FactoryEdgeDetectors.canny(1, true, true, GrayU8.class, GrayS16.class);
     }
 
     @Override
@@ -61,16 +64,20 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         super.declareImages(width, height);
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         storage = ConvertBitmap.declareStorage(bitmap, storage);
+
     }
 
 
     @Override
     protected void process(GrayU8 gray) {
         if (detector != null) {
-            canny.process(gray, 0.1f, 0.3f, null);
+            GrayImageOps.brighten(gray, -30, 200, gray);
+
+            canny.process(gray, 0.1f, 0.3f, gray);
             VisualizeImageData.drawEdgeContours(canny.getContours(), 0xFF0000, bitmap, storage);
             ConvertBitmap.bitmapToGray(bitmap, gray, null);
             List<LineParametric2D_F32> found = detector.detect(gray);
+            filterNearlyDesiredAngles(found, DESIRED_ANGLE, ANGLE_TOLERANCE);
 
             synchronized (lockGui) {
                 ConvertBitmap.grayToBitmap(gray, bitmap, storage);
@@ -112,5 +119,32 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         cam = BitmapFactory.decodeByteArray(b, 0, b.length);
 
         super.convertPreview(bytes, camera);
+    }
+
+    /**
+     * Finds a pair of lines that match the desired angle with some tolerance (both measurements in degrees).
+     * Default is 25 degrees +- 10 degrees
+     * @param found List of lines to search through
+     */
+    private void filterNearlyDesiredAngles(List<LineParametric2D_F32> found, double angle, double tolerance) {
+
+        //convert to radians
+        angle = Math.toRadians(angle);
+        tolerance = Math.toRadians(tolerance);
+
+        List<LineParametric2D_F32> toRemove = new LinkedList<>();
+        for (LineParametric2D_F32 p : found) {
+            boolean pair = false;
+            for (LineParametric2D_F32 s : found) {
+                if(!p.equals(s)
+                        && Math.abs(p.getAngle() - s.getAngle()) < angle+tolerance
+                        && Math.abs(p.getAngle() - s.getAngle()) > angle-tolerance) {
+                    pair = true;
+                }
+            }
+            if(!pair) toRemove.add(p);
+        }
+
+        found.removeAll(toRemove);
     }
 }
