@@ -78,7 +78,6 @@ public class CUEDatabaseService extends AbstractService {
         HashMap<Long, Building> map = new HashMap<Long, Building>();
         for(int i=0; i<buildings.length; i++) {
             map.put(buildings[i].getId(), buildings[i]);
-            Log.d("cuear", "building name: " + buildings[i].getName() + " id: " + buildings[i].getId());
         }
 
         return map;
