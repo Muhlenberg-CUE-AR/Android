@@ -25,7 +25,7 @@ public class Building {
 
     public Building(long id, String name, String shortDesc, String longDesc, Float lat, Float lng){
         // sets all fields given through the constructor
-        this.id = -1;
+        this.id = id;
         this.name = name;
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
