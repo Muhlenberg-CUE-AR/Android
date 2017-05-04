@@ -88,8 +88,10 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
 
 //            filterNearlyDesiredAngles(found, DESIRED_ANGLE, ANGLE_TOLERANCE);
 
-            float t = Intersection2D_F32.intersection(found.get(0), found.get(1));
-            intersection = found.get(0).getPointOnLine(t);
+            if(found.size() == 2) {
+                float t = Intersection2D_F32.intersection(found.get(0), found.get(1));
+                intersection = found.get(0).getPointOnLine(t);
+            }
 
             synchronized (lockGui) {
                 ConvertBitmap.grayToBitmap(gray, bitmap, storage);
@@ -116,18 +118,18 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         l[0] = lines.toList().get(0);
         l[1] = lines.toList().get(1);
 
+        if(intersection != null) {
+            Path p = new Path();
+            p.moveTo(l[0].a.x, l[0].a.y);
+            p.lineTo(intersection.x, intersection.y);
+            p.lineTo(l[1].a.x, l[1].a.y);
+            p.close();
 
-
-        Path p = new Path();
-        p.moveTo(l[0].a.x, l[0].a.y);
-        p.lineTo(intersection.x, intersection.y);
-        p.lineTo(l[1].a.x, l[1].a.y);
-        p.close();
-
-        for (LineSegment2D_F32 s : lines.toList()) {
-            canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
+            for (LineSegment2D_F32 s : lines.toList()) {
+                canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
+            }
+            canvas.drawPath(p, roadPaint);
         }
-        canvas.drawPath(p, roadPaint);
     }
 
     @Override

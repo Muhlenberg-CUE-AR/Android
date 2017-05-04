@@ -26,6 +26,7 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragment;
@@ -100,6 +101,15 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         mainLayout.addView(preview);
 
         setContentView(mainLayout, params);
+
+        image = new ImageView(this);
+        image.setImageResource(R.drawable.pointer);
+        RelativeLayout.LayoutParams imageParams = new RelativeLayout.LayoutParams(100, 100);
+        imageParams.setMargins(100, 100, 100, 100);
+        image.setLayoutParams(imageParams);
+        preview.addView(image, imageParams);
+
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         beyondarFragment = new BeyondarFragment();
         getFragmentManager().beginTransaction().add(mainLayout.getId(), beyondarFragment, "beyondar").commit();
