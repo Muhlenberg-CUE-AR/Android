@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
@@ -26,8 +27,10 @@ import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import georegression.metric.Intersection2D_F32;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Created by Jalal on 4/1/2017.
@@ -42,11 +45,13 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
     private byte[] storage;
     private static Bitmap cam;
     private Paint paint = new Paint();
+    private Paint roadPaint = new Paint();
 
-    public final static boolean DEBUG = true;
+    public final static boolean DEBUG = false;
     private final double ANGLE_TOLERANCE = 15; //in degrees
-    private final double DESIRED_ANGLE = 25; //in degrees
+    private final double DESIRED_ANGLE = 25;   //in degrees
     private CannyEdge<GrayU8, GrayS16> canny;
+    private Point2D_F32 intersection;
 
     public LineDetector(DetectLine<GrayU8> detector) {
         super(ImageType.single(GrayU8.class));
@@ -56,7 +61,10 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2.0f);
 
-        this.canny = FactoryEdgeDetectors.canny(1, true, true, GrayU8.class, GrayS16.class);
+        roadPaint.setColor(Color.argb(60,0,0,200));
+        roadPaint.setStyle(Paint.Style.FILL);
+
+        this.canny = FactoryEdgeDetectors.canny(5, true, true, GrayU8.class, GrayS16.class);
     }
 
     @Override
@@ -77,7 +85,11 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
             VisualizeImageData.drawEdgeContours(canny.getContours(), 0xFF0000, bitmap, storage);
             ConvertBitmap.bitmapToGray(bitmap, gray, null);
             List<LineParametric2D_F32> found = detector.detect(gray);
-            filterNearlyDesiredAngles(found, DESIRED_ANGLE, ANGLE_TOLERANCE);
+
+//            filterNearlyDesiredAngles(found, DESIRED_ANGLE, ANGLE_TOLERANCE);
+
+            float t = Intersection2D_F32.intersection(found.get(0), found.get(1));
+            intersection = found.get(0).getPointOnLine(t);
 
             synchronized (lockGui) {
                 ConvertBitmap.grayToBitmap(gray, bitmap, storage);
@@ -86,6 +98,7 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
                 for (LineParametric2D_F32 p : found) {
                     LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width, gray.height);
                     lines.grow().set(ls.a, ls.b);
+
                 }
             }
         }
@@ -99,9 +112,22 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
         else
             canvas.drawBitmap(bitmap, 0, 0, null);
 
+        LineSegment2D_F32[] l = new LineSegment2D_F32[2];
+        l[0] = lines.toList().get(0);
+        l[1] = lines.toList().get(1);
+
+
+
+        Path p = new Path();
+        p.moveTo(l[0].a.x, l[0].a.y);
+        p.lineTo(intersection.x, intersection.y);
+        p.lineTo(l[1].a.x, l[1].a.y);
+        p.close();
+
         for (LineSegment2D_F32 s : lines.toList()) {
             canvas.drawLine(s.a.x, s.a.y, s.b.x, s.b.y, paint);
         }
+        canvas.drawPath(p, roadPaint);
     }
 
     @Override

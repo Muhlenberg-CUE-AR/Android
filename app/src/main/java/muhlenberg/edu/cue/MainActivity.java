@@ -34,8 +34,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import boofcv.abst.feature.detect.line.DetectLine;
+import boofcv.abst.feature.detect.line.DetectLineHoughFootSubimage;
+import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.android.gui.VideoDisplayActivity;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.GrayS16;
@@ -103,8 +106,11 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
 
         DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
-                new ConfigHoughFoot(5, 5, 5, 30, 5), GrayU8.class, GrayS16.class);
-        setProcessing(new LineDetector(detector));
+                new ConfigHoughFoot(5, 5, 5, 30, 4), GrayU8.class, GrayS16.class);
+        DetectLineHoughFootSubimage detectLineSegment = FactoryDetectLineAlgs.houghFootSub(
+                new ConfigHoughFootSubimage(5, 5, 5, 30, 2, 2, 2), GrayU8.class, GrayS16.class);
+
+        setProcessing(new LineDetector(detectLineSegment));
 
         super.onResume();
     }

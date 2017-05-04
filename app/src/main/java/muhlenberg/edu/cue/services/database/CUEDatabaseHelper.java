@@ -42,8 +42,8 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TOUR_TABLE =
             "CREATE TABLE " + CUEDatabaseContract.Tour.TABLE_NAME + " (" +
-                    _ID + " INTEGER PRIMARY KEY," +
-                    CUEDatabaseContract.Tour.COLUMN_NAME_NAME + " TEXT)";
+                    _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    CUEDatabaseContract.Tour.COLUMN_NAME_NAME + " TEXT);";
 
     private static final String SQL_CREATE_POINT_TABLE =
             "CREATE TABLE " + CUEDatabaseContract.Point.TABLE_NAME + " (" +
@@ -51,7 +51,7 @@ public class CUEDatabaseHelper extends SQLiteOpenHelper {
                     CUEDatabaseContract.Point.COLUMN_NAME_ORDER_NUMBER + " INTEGER," +
                     CUEDatabaseContract.Point.COLUMN_NAME_LATITUDE + " TEXT," +
                     CUEDatabaseContract.Point.COLUMN_NAME_LONGITUDE + " TEXT," +
-                        "FOREIGN KEY (TOUR_ID) REFERENCES TOUR(_ID))";
+                        "FOREIGN KEY (TOUR_ID) REFERENCES TOUR(_ID));";
 
 
     //Used to remove the table when needed
