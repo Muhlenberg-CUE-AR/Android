@@ -1,5 +1,7 @@
 package muhlenberg.edu.cue.util.location;
 
+import android.location.Location;
+
 /**
  * Created by Jalal on 2/25/2017.
  */
@@ -68,5 +70,19 @@ public class CUELocationUtils {
         double z = Math.cos(angle - heading) * distance;
 
         return y * 256 / z;
+    }
+
+    /*
+    converts CUELocation object to Location object
+     */
+    public static Location cueToAndroidLocation(CUELocation myLocation) {
+        Location loc = new Location("");
+        if(myLocation != null) {
+            loc.setLatitude(myLocation.getLatitude());
+            loc.setLongitude(myLocation.getLongitude());
+            loc.setAltitude(myLocation.getAltitude());
+        }
+
+        return loc;
     }
 }

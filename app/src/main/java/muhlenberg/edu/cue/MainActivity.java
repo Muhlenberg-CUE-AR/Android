@@ -10,13 +10,22 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.hardware.GeomagneticField;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragment;
@@ -27,7 +36,6 @@ import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.google.android.gms.location.LocationListener;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,16 +57,15 @@ import muhlenberg.edu.cue.services.database.Tour;
 import muhlenberg.edu.cue.services.location.CUELocationService;
 import muhlenberg.edu.cue.util.fragments.CUEPopup;
 import muhlenberg.edu.cue.util.location.CUELocation;
+import muhlenberg.edu.cue.util.location.CUELocationUtils;
 import muhlenberg.edu.cue.videoprocessing.LineDetector;
-
-import static android.app.DialogFragment.STYLE_NO_FRAME;
 
 
 /**
  * Created by Jalal on 1/28/2017.
  * Willy made some changes to this throughout the project
  */
-public class MainActivity extends VideoDisplayActivity implements LocationListener, OnTouchBeyondarViewListener {
+public class MainActivity extends VideoDisplayActivity implements LocationListener, OnTouchBeyondarViewListener, SensorEventListener {
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 133;
 
@@ -66,6 +73,12 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
     private BeyondarFragment beyondarFragment;
     private World world;
     private Tour tour;
+    // used for compass heading
+    private ImageView image;
+    private SensorManager mSensorManager;
+    private GeomagneticField geoField;
+    private float myBearing = 0f;
+    private float currentDegree = 0f;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,7 +105,7 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         getFragmentManager().beginTransaction().add(mainLayout.getId(), beyondarFragment, "beyondar").commit();
         getFragmentManager().executePendingTransactions();
 
-        setShowFPS(true);
+        setShowFPS(false);
 
     }
 
@@ -104,6 +117,9 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         // gets all the locations on a certain tour route
         this.tour = CUEDatabaseService.getInstance().readTour();
         this.tour.setPointList(CUEDatabaseService.getInstance().readPointList());
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_GAME);
+
 
         DetectLine<GrayU8> detector = FactoryDetectLineAlgs.houghFoot(
                 new ConfigHoughFoot(5, 5, 5, 30, 4), GrayU8.class, GrayS16.class);
@@ -241,6 +257,16 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         // checks to see if the user is on the path
         CUELocation myLocation = new CUELocation(this.world.getLatitude(), this.world.getLongitude());
         CUELocationService.isLocationOnPath(myLocation, this.tour.getPointList(), 10);
+
+        Location currLocation = CUELocationUtils.cueToAndroidLocation(myLocation);
+        Location destLocation = CUELocationUtils.cueToAndroidLocation(this.tour.getPointList().get(0));
+        geoField = new GeomagneticField(
+                Double.valueOf(loc.getLatitude()).floatValue(),
+                Double.valueOf(loc.getLongitude()).floatValue(),
+                Double.valueOf(loc.getAltitude()).floatValue(),
+                System.currentTimeMillis() );
+        myBearing = currLocation.bearingTo(destLocation);
+        myBearing = myBearing * -1;
     }
 
 
@@ -291,6 +317,34 @@ public class MainActivity extends VideoDisplayActivity implements LocationListen
         CUEPopup.text =  name + "\n\n" + longDesc;
         newFragment.show(getFragmentManager(), "dialog");
 
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        float azimuth = event.values[0];
+        try {
+            azimuth += geoField.getDeclination();
+        }
+        catch (Exception e) {
+            Log.d("Exception", e.toString());
+        }
+        azimuth = (myBearing - azimuth) * -1;
+
+        RotateAnimation ra = new RotateAnimation(
+                currentDegree,
+                -azimuth,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
+        );
+
+        ra.setDuration(210);
+        ra.setFillAfter(true);
+
+        image.startAnimation(ra);
+        currentDegree = -azimuth;
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // we are not using this as of now
     }
 
 }
