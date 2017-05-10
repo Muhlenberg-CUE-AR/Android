@@ -47,7 +47,7 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
     private Paint paint = new Paint();
     private Paint roadPaint = new Paint();
 
-    public final static boolean DEBUG = false;
+    public final static boolean DEBUG = true;
     private final double ANGLE_TOLERANCE = 15; //in degrees
     private final double DESIRED_ANGLE = 25;   //in degrees
     private CannyEdge<GrayU8, GrayS16> canny;
@@ -120,9 +120,9 @@ public class LineDetector extends VideoRenderProcessing<GrayU8> {
 
         if(intersection != null) {
             Path p = new Path();
-            p.moveTo(l[0].a.x, l[0].a.y);
+            p.moveTo(l[0].b.x, l[0].b.y);
             p.lineTo(intersection.x, intersection.y);
-            p.lineTo(l[1].a.x, l[1].a.y);
+            p.lineTo(l[1].b.x, l[1].b.y);
             p.close();
 
             for (LineSegment2D_F32 s : lines.toList()) {
